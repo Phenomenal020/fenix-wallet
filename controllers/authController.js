@@ -57,10 +57,9 @@ exports.getSignup = (req, res, next) => {
   });
 };
 
-exports.postLogin = (req, res, next) => {
+exports.postLogin = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).render("auth/login", {
@@ -74,98 +73,87 @@ exports.postLogin = (req, res, next) => {
       validationErrors: errors.array(),
     });
   }
-
-  ModelUser.findOne({ email: email })
-    .then((user) => {
-      if (!user) {
-        return res.status(422).render("auth/login", {
-          path: "/login",
-          pageTitle: "Login",
-          errorMessage: "Invalid email or password.",
-          oldInput: {
-            email: email,
-            password: password,
-          },
-          validationErrors: [],
-        });
-      }
-      bcrypt
-        .compare(password, user.password)
-        .then((match) => {
-          if (match) {
-            // req.session.isLoggedIn = true;
-            req.session.user = user;
-            return req.session.save((err) => {
-              console.log(err);
-              res.redirect("/");
-            });
-          }
-          return res.status(422).render("auth/login", {
-            path: "/login",
-            pageTitle: "Login",
-            errorMessage: "Invalid email or password.",
-            oldInput: {
-              email: email,
-              password: password,
-            },
-            validationErrors: [],
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-          res.redirect("/login");
-        });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
-};
-
-exports.postSignup = (req, res, next) => {
-  //TODO: extract relevant fields
-    //   const email = req.body.email;
-  //   const password = req.body.password;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).render("auth/signup", {
-      path: "/signup",
-      pageTitle: "Signup",
-      errorMessage: errors.array()[0].msg,
+  const newUser = await ModelUser.findOne({ email: email });
+  if (!newUser) {
+    return res.status(422).render("auth/login", {
+      path: "/login",
+      pageTitle: "Login",
+      errorMessage: "Invalid email or password.",
       oldInput: {
         email: email,
         password: password,
-        confirmPassword: req.body.confirmPassword,
       },
-      validationErrors: errors.array(),
+      validationErrors: [],
     });
   }
-  bcrypt
-    .hash(password, 12)
-    .then((hashedPassword) => {
-      // create a new user
-      const user = new ModelUser({
-        // email: email,
-        // password: hashedPassword,
-      });
-      return user.save();
-    })
-    .then((result) => {
-      // redirect to login page
-      res.redirect("/login");
-      // return transporter.sendMail({
-      //   to: email,
-      //   from: 'shop@node-complete.com',
-      //   subject: 'Signup succeeded!',
-      //   html: '<h1>You successfully signed up!</h1>'
-      // });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
+  const isMatch = await bcrypt.compare(password, newUser.password);
+  if (isMatch) {
+    req.session.user = newUser;
+    return req.session.save((err) => {
+      console.log(err);
+      res.redirect("/");
     });
+  } else {
+    return res.status(422).render("auth/login", {
+      path: "/login",
+      pageTitle: "Login",
+      errorMessage: "Invalid email or password.",
+      oldInput: {
+        email: email,
+        password: password,
+      },
+      validationErrors: [],
+    });
+  }
+};
+
+exports.postSignup = async (req, res, next) => {
+  try {
+    const email = req.body.email;
+    const password = req.body.password;
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const otherNames = req.body.otherNames;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).render("auth/signup", {
+        path: "/signup",
+        pageTitle: "Signup",
+        errorMessage: errors.array()[0].msg,
+        oldInput: {
+          email: email,
+          password: password,
+          firstName: firstName,
+          lastName: lastName,
+          otherNames: otherNames,
+        },
+        validationErrors: errors.array(),
+      });
+    }
+    const hashedPassword = await bcrypt.hash(password, 12);
+    // create a new user
+    const newUser = new ModelUser({
+      email: email,
+      password: hashedPassword,
+      firstName: firstName,
+      lastName: lastName,
+      otherNames: otherNames,
+    });
+    await newUser.save();
+    // return transporter.sendMail({
+    //   to: email,
+    //   from: 'shop@node-complete.com',
+    //   subject: 'Signup succeeded!',
+    //   html: '<h1>You successfully signed up!</h1>'
+    // });
+    return res.render("register-success", {
+      message: "User registered successfully",
+    });
+  } catch (error) {
+    return res.status(500).render("register-error", {
+      error: error.message,
+    });
+  }
 };
 
 exports.postLogout = (req, res, next) => {

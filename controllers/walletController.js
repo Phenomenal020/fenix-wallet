@@ -1,5 +1,7 @@
 const ModelUser = require("../models/user.mongo");
 const Wallet = require("../models/wallet.mongo");
+const admin = require("../models/admin.mongo");
+const Transfer = require("../models/transfer.mongo");
 
 // req.body = {amount: N500}
 // user will come from the req.session
@@ -37,44 +39,35 @@ exports.postDeposit = async (req, res, next) => {
 exports.postTransfer = async (req, res, next) => {
   try {
     // get the amount from the req body
-    const { amount } = req.body;
-    // get the email or account number from the body
-    const accountNumber = req.body.accountNumber
-      ? req.body.accountNumber
-      : null;
-    const email = req.body.email ? req.body.email : null;
+    const { to, amount } = req.body;
+    const recipientWallet = await Wallet.find({ accountNumber: to });
+    if (!recipientWallet) {
+      return res.status(422).render("transfer-failure", {
+        error: "Invalid account number",
+      });
+    }
     // get the user from the req session
     const user = req.session.user;
     // use the user to extract the walletId, then find the wallet using that id
     const userWallet = await Wallet.findOne({ userID: user.userID });
-    // use the field from req.body to find the user and extract the walletId, then find the wallet using that id
-    let recipientWallet = {};
-    let recipientUser = {};
-    if (accountNumber) {
-      recipientWallet = await Wallet.findOne({ accountNumber: accountNumber }); // add other fields later
-    } else {
-      recipientUser = await ModelUser.findOne({ email: email }); // add other fields later
-      if (!recipientUser) {
-        req.flash.error("error", "No such user in the database");
-        // do more
-      } else {
-        recipientWallet = await Wallet.findOne({ _id: recipientUser.walletId });
-      }
-    }
     // create a transfer object like this
     // { from: this wallet id,to: receipent wallet, amount: amount}
+    // and
+    // save to transfer database
     if (userWallet.balance >= amount) {
-      const transfer = {
+      const transfer = new Transfer({
         from: userWallet.accountNumber,
         to: recipientWallet.accountNumber,
         amount: amount,
-      };
+      });
+      // decrease wallet balance by amount
+      userWallet.balance -= amount;
       // add this to the transfers array of the wallet
       userWallet.transfers.push(transfer);
-      // decrease wallet balance by amount
-      //   REMAINING: Send approval request to control with the transfer details
-      //   await wallet.save();
-      res.render("transfer-pending");
+      //await wallet.save();
+      return res.render("/", {
+        message: "transfer successful",
+      });
     } else {
       req.flash("error", "Wallet balance is insufficient.");
       res.redirect("/deposit");

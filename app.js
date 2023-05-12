@@ -81,6 +81,20 @@ app.get("/profile", (req, res) => {
   });
 });
 
+app.get("/auth/register", (req, res) => {
+  res.render("register", {
+    layout: "index",
+    title: "Register",
+  });
+});
+
+app.get("/auth/login", (req, res) => {
+  res.render("login", {
+    layout: "index",
+    title: "Login",
+  });
+});
+
 app.get("/", (req, res) => {
   res.render("home", { title: "Dashboard" });
 });

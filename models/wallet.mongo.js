@@ -1,21 +1,3 @@
-// #TODO: Mongoose Wallet model with fields:
-// userID : type mongodb id (to represent user model _id)
-// active: boolean showing whether this wallet has been activated or not
-// deposits: {
-//         from: type mongodb id for wallet id (this wallet),
-//         amount: type number,
-//     }
-//     withdrawals: {
-//         to: type mongodb id for wallet id (another wallet),
-//         amount: type number,
-//     }
-//     transfers: {
-//         from: type mongodb id for wallet id (this wallet),
-//         to: type mongodb id for wallet id (abother wallet),
-//         amount: type number,
-//         status: type pending/approved/declined
-//     }
-
 const mongoose = require("mongoose");
 
 const walletSchema = new mongoose.Schema({
@@ -76,7 +58,7 @@ const walletSchema = new mongoose.Schema({
       },
       status: {
         type: String,
-        enum: ["pending", "approved", "declined"],
+        // enum: ["pending", "approved", "declined"],
         default: "pending",
       },
     },
@@ -87,6 +69,7 @@ const walletSchema = new mongoose.Schema({
     ref: "ModelUser",
     default: 0,
   },
+  pendingBal: [{ type: number }],
 });
 
 const Wallet = mongoose.model("Wallet", walletSchema);
