@@ -1,0 +1,67 @@
+{{!< profile }}
+
+<section class="profile-container">
+
+  <div class="profile-picture-container">
+    <div class="profile-picture-wrapper">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+        class="profile-picture"
+        alt="Profile Picture"
+      />
+      <div>
+        {{! <input type="text" /> }}
+        {{! <i class="bi bi-camera-fill camera-icon"></i> }}
+      </div>
+    </div>
+  </div>
+
+  <form>
+
+    <div class="form-group" style="margin: 12px auto;">
+      <label for="firstName">First Name</label>
+      <input type="text" class="form-control" id="firstName" name="firstName" />
+    </div>
+
+    <div class="form-group" style="margin: 12px auto;">
+      <label for="lastName">Last Name</label>
+      <input type="text" class="form-control" id="lastName" name="lastName" />
+    </div>
+
+    <div class="form-group" style="margin: 12px auto;">
+      <label for="otherNames">Other Names</label>
+      <input
+        type="text"
+        class="form-control"
+        id="otherNames"
+        name="otherNames"
+      />
+    </div>
+
+    <div class="form-group" style="margin: 12px auto;">
+      <label for="email">Email</label>
+      <input type="email" class="form-control" id="email" name="email" />
+    </div>
+
+    <div class="form-group" style="margin: 12px auto;">
+      <label for="accountNumber">Account Number</label>
+      <input
+        type="text"
+        class="form-control"
+        id="accountNumber"
+        readonly
+        value="3099-418-253"
+        name="accountNumber"
+      />
+    </div>
+
+    <div style="display: flex; justify-content: center">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        style="margin-top: 8px"
+      >Update</button>
+    </div>
+
+  </form>
+</section>

@@ -1,5 +1,3 @@
-const path = require("path");
-
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -8,9 +6,21 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
 const flash = require("connect-flash");
 
+// require express-handlebars
+const handleBars = require("express-handlebars");
+
+// require node js path module for directory/file navigation
+const path = require("path");
+
 require("dotenv").config();
 
 // const errorController = require('./controllers/error');
+
+// Set the views directory using path.dirname
+const viewsPath = path.join(__dirname, "views");
+
+// Quick Tutorial: What if the views folder was located 4 folders above app.js
+// const viewsPath = path.join(__dirname, '../../../../../views');
 
 const app = express();
 const store = new MongoDBStore({
@@ -19,8 +29,19 @@ const store = new MongoDBStore({
 });
 const csrfProtection = csrf();
 
-// app.set('view engine', 'ejs');
-// app.set('views', 'views');
+// register your view engine - handlebars
+app.engine(
+  "hbs",
+  handleBars({
+    layoutsDir: viewsPath,
+    extname: "hbs",
+    defaultLayout: "main", // Specify the main layout file (main.hbs)
+    layoutsDir: viewsPath + "/layouts", // Specify the directory for layout files
+    partialsDir: viewsPath + "/partials", // Specify the directory for partials
+  })
+);
+app.set("view engine", "hbs");
+app.set("views", viewsPath);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -34,6 +55,35 @@ app.use(
 );
 app.use(csrfProtection);
 app.use(flash());
+
+app.get("/deposit", (req, res) => {
+  res.render("deposit", {
+    title: "Deposit",
+  });
+});
+
+app.get("/withdraw", (req, res) => {
+  res.render("withdraw", {
+    title: "Withdraw",
+  });
+});
+
+app.get("/transfer", (req, res) => {
+  res.render("transfer", {
+    title: "Transfer",
+  });
+});
+
+app.get("/profile", (req, res) => {
+  res.render("view-profile", {
+    layout: "profile",
+    title: "Profile",
+  });
+});
+
+app.get("/", (req, res) => {
+  res.render("home", { title: "Dashboard" });
+});
 
 // app.use((req, res, next) => {
 //   res.locals.isAuthenticated = req.session.isLoggedIn;
@@ -70,9 +120,13 @@ app.use(flash());
 // });
 
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then((result) => {
     app.listen(process.env.PORT);
+    console.log(`listening on PORT ${process.env.PORT}`);
   })
   .catch((err) => {
     console.log(err);
