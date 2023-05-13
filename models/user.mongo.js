@@ -25,7 +25,7 @@ const modelUserSchema = new mongoose.Schema(
       },
     },
     walletId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Wallet",
     },
   },

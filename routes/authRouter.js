@@ -3,15 +3,14 @@ const { check, body } = require("express-validator/check");
 
 const authController = require("../controllers/authController");
 const ModelUser = require("../models/user.mongo");
-
 const router = express.Router();
 
 router.get("/login", authController.getLogin);
 
-router.get("/signup", authController.getSignup);
+router.get("/register", authController.getSignup);
 
 router.post(
-  "/login",
+  "/login", 
   [
     body("email")
       .isEmail()
@@ -26,11 +25,11 @@ router.post(
 );
 
 router.post(
-  "/signup",
-  [
-    check("email")
-      .isEmail()
-      .withMessage("Please enter a valid email.")
+  "/register",
+  // [
+  //   check("email")
+  //     .isEmail()
+  //     .withMessage("Please enter a valid email.")
     //   .custom((value, { req }) => {
     //     return User.findOne({ email: value }).then((userDoc) => {
     //       if (userDoc) {
@@ -40,26 +39,25 @@ router.post(
     //       }
     //     });
     //   })
-      .normalizeEmail(),
-    body(
-      "password",
-      "Please enter a password with only numbers and text and at least 5 characters."
-    )
-      .isLength({ min: 5 })
-      .isAlphanumeric()
-      .trim(),
-    body("confirmPassword")
-      .trim()
-      .custom((value, { req }) => {
-        if (value !== req.body.password) {
-          throw new Error("Passwords do not match!");
-        }
-        return true;
-      }),
-  ],
-  authController.postSignup
-);
+//       .normalizeEmail(),
+//     body(
+//       "password",
+//       "Please enter a password with only numbers and text and at least 5 characters."
+//     )
+//       .isLength({ min: 5 })
+//       .isAlphanumeric()
+//       .trim(),
+//     body("confirmPassword")
+//       .trim()
+//       .custom((value, { req }) => {
+//         if (value !== req.body.password) {
+//           throw new Error("Passwords do not match!");
+//         }
+//         return true;
+//       }),
+//   ],
+  authController.postSignup);
 
-router.post("/logout", authController.postLogout);
+router.get("/logout", authController.postLogout);
 
 module.exports = router;

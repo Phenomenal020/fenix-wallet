@@ -17,62 +17,50 @@ const ModelUser = require("../models/user.mongo");
 // );
 
 exports.getLogin = (req, res, next) => {
-  // check if there are error messages
+  //check if there are error messages
   let message = req.flash("error");
   if (message.length > 0) {
     message = message[0];
   } else {
     message = null;
   }
-  res.render("auth/login", {
-    path: "/login",
-    pageTitle: "Login",
-    errorMessage: message,
-    oldInput: {
-      email: "",
-      password: "",
-    },  // so the user doesn't type everything all over again
-    validationErrors: [],
+  res.render("login", {
+    layout: "index",
+    title: "Login",
   });
 };
 
 exports.getSignup = (req, res, next) => {
-    // check if there are errors
+  // check if there are errors
   let message = req.flash("error");
   if (message.length > 0) {
     message = message[0];
   } else {
     message = null;
   }
-  res.render("auth/signup", {
-    path: "/signup",
-    pageTitle: "Signup",
-    errorMessage: message,
-    oldInput: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },  // so the user doesn't have to type everything all over again
-    validationErrors: [],
+  res.render("register", {
+    layout: "index",
+    title: "Register",
   });
 };
 
 exports.postLogin = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).render("auth/login", {
-      path: "/login",
-      pageTitle: "Login",
-      errorMessage: errors.array()[0].msg,
-      oldInput: {
-        email: email,
-        password: password,
-      },
-      validationErrors: errors.array(),
-    });
-  }
+
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   return res.status(422).render("auth/login", {
+  //     path: "/login",
+  //     pageTitle: "Login",
+  //     errorMessage: errors.array()[0].msg,
+  //     oldInput: {
+  //       email: email,
+  //       password: password,
+  //     },
+  //     validationErrors: errors.array(),
+  //   });
+  // }
   const newUser = await ModelUser.findOne({ email: email });
   if (!newUser) {
     return res.status(422).render("auth/login", {
@@ -109,27 +97,27 @@ exports.postLogin = async (req, res, next) => {
 
 exports.postSignup = async (req, res, next) => {
   try {
-    const email = req.body.email;
-    const password = req.body.password;
-    const firstName = req.body.firstName;
-    const lastName = req.body.lastName;
-    const otherNames = req.body.otherNames;
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(422).render("auth/signup", {
-        path: "/signup",
-        pageTitle: "Signup",
-        errorMessage: errors.array()[0].msg,
-        oldInput: {
-          email: email,
-          password: password,
-          firstName: firstName,
-          lastName: lastName,
-          otherNames: otherNames,
-        },
-        validationErrors: errors.array(),
-      });
-    }
+    // const email = req.body.email;
+    // const password = req.body.password;
+    // const firstName = req.body.firstName;
+    // const lastName = req.body.lastName;
+    // const otherNames = req.body.otherNames;
+    // const errors = validationResult(req);
+    // if (!errors.isEmpty()) {
+    //   return res.status(422).render("auth/register", {
+    //     path: "/register",
+    //     pageTitle: "register",
+    //     errorMessage: errors.array()[0].msg,
+    //     oldInput: {
+    //       email: email,
+    //       password: password,
+    //       firstName: firstName,
+    //       lastName: lastName,
+    //       otherNames: otherNames,
+    //     },
+    //     validationErrors: errors.array(),
+    //   });
+    // }
     const hashedPassword = await bcrypt.hash(password, 12);
     // create a new user
     const newUser = new ModelUser({
@@ -139,16 +127,16 @@ exports.postSignup = async (req, res, next) => {
       lastName: lastName,
       otherNames: otherNames,
     });
+    
     await newUser.save();
+    console.log(newUser)
     // return transporter.sendMail({
     //   to: email,
     //   from: 'shop@node-complete.com',
     //   subject: 'Signup succeeded!',
     //   html: '<h1>You successfully signed up!</h1>'
     // });
-    return res.render("register-success", {
-      message: "User registered successfully",
-    });
+    return res.redirect('/auth/login');
   } catch (error) {
     return res.status(500).render("register-error", {
       error: error.message,
@@ -159,8 +147,11 @@ exports.postSignup = async (req, res, next) => {
 exports.postLogout = (req, res, next) => {
   // just destroy the session
   req.session.destroy((err) => {
-    console.log(err);
-    res.redirect("/login");
+    if (err) {
+      console.log(err);
+    } else {
+      res.redirect("/auth/login");
+    }
   });
 };
 

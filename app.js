@@ -14,6 +14,7 @@ const path = require("path");
 
 require("dotenv").config();
 
+const authRouter = require("./routes/authRouter");
 // const errorController = require('./controllers/error');
 
 // Set the views directory using path.dirname
@@ -55,6 +56,8 @@ app.use(
 );
 app.use(csrfProtection);
 app.use(flash());
+
+app.use("/auth", authRouter);
 
 app.get("/deposit", (req, res) => {
   res.render("deposit", {
