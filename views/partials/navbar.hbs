@@ -2,25 +2,44 @@
 <nav>
   <div class="sidebar-button">
     {{! <i class="bx bx-menu sidebarBtn"></i> }}
-    <span class="dashboard">Welcome back, Xander</span>
+    <span class="dashboard">Welcome back, {{firstName}}</span>
   </div>
-  <div class="profile-details">
-    <a href="/auth/register" class="auth-btn">Sign up</a>
-  </div>
+  {{#if firstName}}{{else}}
+    <div class="profile-details">
+      <a href="/auth/register" class="auth-btn">Sign up</a>
+    </div>
+  {{/if}}
 </nav>
 
 {{! summary cards }}
-<div class="overview-boxes">
-  <div class="box">
-    <p class="box-topic">Available Balance</p>
-    <p class="number">₦40,876</p>
+{{#if totalBalance}}
+  <div class="overview-boxes">
+    <div class="box">
+      <p class="box-topic">Available Balance</p>
+      <p class="number">₦{{totalBalance}}</p>
+    </div>
+    <div class="box">
+      <p class="box-topic">Total Deposits</p>
+      <p class="number">₦{{totalDeposits}}</p>
+    </div>
+    <div class="box">
+      <p class="box-topic">Total Withdrawals</p>
+      <p class="number">₦{{totalWithdrawals}}</p>
+    </div>
   </div>
-  <div class="box">
-    <p class="box-topic">Total Deposits</p>
-    <p class="number">₦38,876</p>
+{{else}}
+  <div class="overview-boxes">
+    <div class="box">
+      <p class="box-topic">Available Balance</p>
+      <p class="number">₦0</p>
+    </div>
+    <div class="box">
+      <p class="box-topic">Total Deposits</p>
+      <p class="number">₦0</p>
+    </div>
+    <div class="box">
+      <p class="box-topic">Total Withdrawals</p>
+      <p class="number">₦0</p>
+    </div>
   </div>
-  <div class="box">
-    <p class="box-topic">Total Withdrawals</p>
-    <p class="number">₦11,086</p>
-  </div>
-</div>
+{{/if}}

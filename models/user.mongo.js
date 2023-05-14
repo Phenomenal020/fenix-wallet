@@ -11,9 +11,6 @@ const modelUserSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
-      otherNames: {
-        type: String
-      },
       password: {
         type: String,
         required: true,
@@ -22,10 +19,18 @@ const modelUserSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
+      phoneNumber: {
+        type: String,
+        required: true,
+      },
     },
-    walletId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Wallet",
+    // walletId: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   required: true,
+    // },
+    walletAcctNumber: {
+      type: String,
+      required: true
     },
     status: {
       type: String,

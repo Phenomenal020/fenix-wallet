@@ -3,7 +3,14 @@
 <!-- Additional markup specific to the deposit page -->
 <section class="deposit-container">
   <h1 class="section-header">Withdraw</h1>
-  <form class="section-form">
+
+  {{#if errorMessage}}
+    <p class="error-message" id="msgBox">
+      {{errorMessage}}
+    </p>
+  {{/if}}
+
+  <form class="section-form" action="/actions/withdraw" method="post">
     <div class="mb-3 row">
       <label for="withdrawField" class="col-sm-4 col-form-label">Account Number:</label>
       <div class="col-sm-8">
@@ -12,7 +19,7 @@
           readonly
           class="form-control-plaintext"
           id="withdrawField"
-          value="3099-418-253"
+          value="{{oldInput.from}}"
         />
       </div>
     </div>
@@ -22,7 +29,15 @@
         class="col-sm-4 col-form-label"
       >Amount</label>
       <div class="col-sm-8">
-        <input type="text" class="form-control" id="withdrawSubmitBtn" />
+        <input
+          type="number"
+          class="form-control"
+          min="0"
+          id="submitWithdraw"
+          value="{{oldInput.amount}}"
+          name="amount"
+          oninput="checkMinimumValue(this)"
+        />
       </div>
     </div>
     <div class="text-center">
@@ -31,3 +46,17 @@
     {{!-- <input type="hidden" name="_csrf" value="{{csrfToken}}" / deprecated > --}}
   </form>
 </section>
+
+<script>
+  function clearMsg() { const msgRef = document.querySelector("#msgBox");
+  msgRef.textContent = "" }; const submitWithdrawRef =
+  document.querySelector("#submitWithdraw");
+  submitWithdrawRef.addEventListener("focus", clearMsg);
+
+  function checkMinimumValue(inputElement) {
+  if (inputElement.value < 0) {
+    inputElement.value = 0; // Set the value to 0 if it's less than 0
+  }
+}
+
+</script>

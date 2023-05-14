@@ -124,12 +124,12 @@
   font-size: 18px;
   margin-right: 24px;
   text-decoration: none;
-  color: #10367e ;
+  color: #10367e;
   font-weight: bold;
 }
 
 .auth-btn:hover {
-  color:  #0a255898;
+  color: #0a255898;
 }
 
 .overview-boxes {
@@ -309,6 +309,11 @@
 
 .success-message {
   color: green;
+  text-align: center;
+}
+
+.error-message {
+  color: red;
   text-align: center;
 }
 

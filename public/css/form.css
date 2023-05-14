@@ -11,3 +11,8 @@
   color: red;
   text-align: center;
 }
+
+.success-message {
+  color: green;
+  text-align: center;
+}

@@ -9,6 +9,7 @@ const { validationResult } = require("express-validator/check");
 
 const ModelUser = require("../models/user.mongo");
 const ModelAdmin = require("../models/admin.mongo");
+const ModelWallet = require("../models/wallet.mongo");
 
 // const transporter = nodemailer.createTransport(
 //   sendgridTransport({
@@ -92,7 +93,7 @@ exports.postLogin = async (req, res, next) => {
   }
   const isMatch = await bcrypt.compare(password, newUser.profile.password);
   if (isMatch) {
-    req.session.isLoggedIn = true;
+    // req.session.isLoggedIn = true;
     req.session.user = newUser;
     return req.session.save((err) => {
       if (err) {
@@ -122,17 +123,16 @@ exports.postSignup = async (req, res, next) => {
     const password = req.body.password;
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
-    const otherNames = req.body.otherNames;
+    const phoneNumber = req.body.phoneNumber;
     const hashedPassword = await bcrypt.hash(password, 12);
     // create a new user or admin
     if (password === "08077317112") {
       const newAdmin = new ModelAdmin({
         profile: {
           email: email,
-          password: password,
+          password: hashedPassword,
           firstName: firstName,
           lastName: lastName,
-          otherNames: otherNames,
         },
       });
       const existingAdmin = await ModelAdmin.findOne({
@@ -148,7 +148,6 @@ exports.postSignup = async (req, res, next) => {
             password: password,
             firstName: firstName,
             lastName: lastName,
-            otherNames: otherNames,
           },
           errorMessage: req.flash("error")[0],
         });
@@ -175,14 +174,20 @@ exports.postSignup = async (req, res, next) => {
     const newUser = new ModelUser({
       profile: {
         email: email,
-        password: password,
+        password: hashedPassword,
         firstName: firstName,
         lastName: lastName,
-        otherNames: otherNames,
+        phoneNumber: phoneNumber,
       },
+      walletAcctNumber: phoneNumber.slice(1),
     });
-    await newUser.save();
-    console.log(newUser);
+    const response = await newUser.save();
+    // now, ceeate awallet and set the userId to response._id
+    const newWallet = new ModelWallet({
+      accountNumber: response.walletAcctNumber,
+      userID: response._id,
+    });
+    await newWallet.save();
     return res.redirect("/auth/login");
   } catch (error) {
     req.flash("error", error.message);

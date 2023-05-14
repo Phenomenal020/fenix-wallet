@@ -16,6 +16,10 @@ require("dotenv").config();
 
 const authRouter = require("./routes/authRouter");
 const actionsRouter = require("./routes/actionsRouter");
+
+const ModelUser = require("./models/user.mongo");
+const { requireAuth } = require("./middleware/is-auth");
+const Wallet = require("./models/wallet.mongo");
 // const errorController = require('./controllers/error');
 
 // Set the views directory using path.dirname
@@ -62,33 +66,40 @@ app.use(
 
 app.use(flash());
 
-app.use((req, res, next) => {
-  res.locals.isAuthenticated = req.session.isLoggedIn;
-  // res.locals.csrfToken = req.csrfToken(); // deprecated
-  next();
-});
+// app.use((req, res, next) => {
+//   res.locals.isAuthenticated = req.session.isLoggedIn;
+//   // res.locals.csrfToken = req.csrfToken(); // deprecated
+//   next();
+// });
 
 app.use("/auth", authRouter);
 app.use("/actions", actionsRouter);
 
-app.get("/", (req, res) => {
-  res.render("home", { title: "Dashboard",  successMsg: req.flash("success")[0], });
+app.get("/", requireAuth, async (req, res) => {
+  const wallet = await Wallet.findOne({ userID: req.session.user._id });
+  res.render("home", {
+    title: "Dashboard",
+    successMsg: req.flash("success")[0],
+    firstName: req.session ? req.session.user.profile.firstName : "",
+    totalBalance: wallet.totalBalance,
+    totalDeposits: wallet.totalDeposits,
+    totalWithdrawals: wallet.totalWithdrawals,
+  });
 });
 
 // app.use((req, res, next) => {
-//   // throw new Error('Sync Dummy');
 //   if (!req.session.user) {
 //     return next();
 //   }
-//   User.findById(req.session.user._id)
-//     .then(user => {
+//   ModelUser.findById(req.session.user._id)
+//     .then((user) => {
 //       if (!user) {
 //         return next();
 //       }
 //       req.user = user;
 //       next();
 //     })
-//     .catch(err => {
+//     .catch((err) => {
 //       next(new Error(err));
 //     });
 // });

@@ -38,17 +38,6 @@
   </div>
 
   <div class="form-group" style="margin: 12px auto;">
-    <label for="otherNames">Other Names: </label>
-    <input
-      type="text"
-      class="form-control"
-      id="otherNames"
-      name="otherNames"
-      value="{{oldInput.otherNames}}"
-    />
-  </div>
-
-  <div class="form-group" style="margin: 12px auto;">
     <label for="email">Email: </label>
     <input
       type="email"
@@ -72,6 +61,17 @@
     />
   </div>
 
+  <div class="form-group" style="margin: 12px auto;">
+    <label for="phoneNumber">Phone Number: </label>
+    <input
+      type="text"
+      class="form-control"
+      id="phoneNumber"
+      name="phoneNumber"
+      value="{{oldInput.phoneNumber}}"
+    />
+  </div>
+
   <div style="display: flex; justify-content: center">
     <button
       type="submit"
@@ -88,21 +88,23 @@
 
 <script>
 
-  function clearMsg() {
-    const msgRef = document.querySelector("#msgBox")
-    msgRef.textContent = ""
-  }
+  function clearMsg() { const msgRef = document.querySelector("#msgBox")
+  msgRef.textContent = "" }
+  
+   // get the input forms const passwordRef =
+  document.querySelector("#password") 
+  passwordRef.addEventListener("focus",clearMsg)
+  
+  const emailRef = document.querySelector("#email")
+  emailRef.addEventListener("focus", clearMsg) 
+  
+  const lastNameRef = document.querySelector("#lastName")
+  lastNameRef.addEventListener("focus", clearMsg) 
+  
+  const firstNameRef = document.querySelector("#firstName")
+  firstNameRef.addEventListener("focus", clearMsg) 
 
-  // get the input forms
-  const passwordRef = document.querySelector("#password") 
-  passwordRef.addEventListener("focus", clearMsg)
-  const emailRef = document.querySelector("#email") 
-  emailRef.addEventListener("focus", clearMsg)
-  const lastNameRef = document.querySelector("#lastName") 
-  lastNameRef.addEventListener("focus", clearMsg)
-  const firstNameRef = document.querySelector("#firstName") 
-  firstNameRef.addEventListener("focus", clearMsg)
-  const otherNamesRef = document.querySelector("#otherNames") 
-  otherNamesRef.addEventListener("focus", clearMsg)
+  const phoneRef = document.querySelector("#phoneNumber") 
+  phoneRef.addEventListener("focus", clearMsg)
 
 </script>
