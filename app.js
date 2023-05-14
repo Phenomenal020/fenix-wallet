@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
-const csrf = require("csurf");
+// const csrf = require("csurf"); // deprecated
 const flash = require("connect-flash");
 
 // require express-handlebars
@@ -15,6 +15,7 @@ const path = require("path");
 require("dotenv").config();
 
 const authRouter = require("./routes/authRouter");
+const actionsRouter = require("./routes/actionsRouter");
 // const errorController = require('./controllers/error');
 
 // Set the views directory using path.dirname
@@ -28,7 +29,10 @@ const store = new MongoDBStore({
   uri: process.env.MONGODB_URI,
   collection: "sessions",
 });
-const csrfProtection = csrf();
+
+// Middleware to parse JSON payloads
+// app.use(express.json());
+// const csrfProtection = csrf(); deprecated
 
 // register your view engine - handlebars
 app.engine(
@@ -44,6 +48,7 @@ app.engine(
 app.set("view engine", "hbs");
 app.set("views", viewsPath);
 
+// app.use(csrfProtection);  //deprecated
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
@@ -54,59 +59,21 @@ app.use(
     store: store,
   })
 );
-app.use(csrfProtection);
+
 app.use(flash());
 
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  // res.locals.csrfToken = req.csrfToken(); // deprecated
+  next();
+});
+
 app.use("/auth", authRouter);
-
-app.get("/deposit", (req, res) => {
-  res.render("deposit", {
-    title: "Deposit",
-  });
-});
-
-app.get("/withdraw", (req, res) => {
-  res.render("withdraw", {
-    title: "Withdraw",
-  });
-});
-
-app.get("/transfer", (req, res) => {
-  res.render("transfer", {
-    title: "Transfer",
-  });
-});
-
-app.get("/profile", (req, res) => {
-  res.render("view-profile", {
-    layout: "profile",
-    title: "Profile",
-  });
-});
-
-app.get("/auth/register", (req, res) => {
-  res.render("register", {
-    layout: "index",
-    title: "Register",
-  });
-});
-
-app.get("/auth/login", (req, res) => {
-  res.render("login", {
-    layout: "index",
-    title: "Login",
-  });
-});
+app.use("/actions", actionsRouter);
 
 app.get("/", (req, res) => {
-  res.render("home", { title: "Dashboard" });
+  res.render("home", { title: "Dashboard",  successMsg: req.flash("success")[0], });
 });
-
-// app.use((req, res, next) => {
-//   res.locals.isAuthenticated = req.session.isLoggedIn;
-//   res.locals.csrfToken = req.csrfToken();
-//   next();
-// });
 
 // app.use((req, res, next) => {
 //   // throw new Error('Sync Dummy');

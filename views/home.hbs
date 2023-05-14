@@ -1,5 +1,9 @@
 {{!< main }}
 
+{{#if successMsg}}
+  <p class="success-message">{{successMsg}}</p>
+{{/if}}
+
 <div class="wallet-activity-wrapper">
   <h4 style="color: #333; margin-top: 6px">Wallet activities</h4>
   <div class="card">
@@ -53,4 +57,5 @@
       <!-- Add more transaction cards here -->
     </div>
   </div>
+  {{!-- <input type="hidden" name="_csrf" value="{{csrfToken}}" /> deprecated --}}
 </div>

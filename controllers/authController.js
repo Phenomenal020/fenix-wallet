@@ -1,11 +1,14 @@
 // const crypto = require("crypto");
 
 const bcrypt = require("bcryptjs");
+
 // const nodemailer = require('nodemailer');
 // const sendgridTransport = require('nodemailer-sendgrid-transport');
+
 const { validationResult } = require("express-validator/check");
 
 const ModelUser = require("../models/user.mongo");
+const ModelAdmin = require("../models/admin.mongo");
 
 // const transporter = nodemailer.createTransport(
 //   sendgridTransport({
@@ -17,140 +20,187 @@ const ModelUser = require("../models/user.mongo");
 // );
 
 exports.getLogin = (req, res, next) => {
-  //check if there are error messages
-  let message = req.flash("error");
-  if (message.length > 0) {
-    message = message[0];
-  } else {
-    message = null;
-  }
   res.render("login", {
     layout: "index",
     title: "Login",
+    errorMessage: req.flash("error")[0],
   });
 };
 
 exports.getSignup = (req, res, next) => {
-  // check if there are errors
-  let message = req.flash("error");
-  if (message.length > 0) {
-    message = message[0];
-  } else {
-    message = null;
-  }
   res.render("register", {
     layout: "index",
     title: "Register",
+    errorMessage: req.flash("error")[0],
   });
 };
 
 exports.postLogin = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-
-  // const errors = validationResult(req);
-  // if (!errors.isEmpty()) {
-  //   return res.status(422).render("auth/login", {
-  //     path: "/login",
-  //     pageTitle: "Login",
-  //     errorMessage: errors.array()[0].msg,
-  //     oldInput: {
-  //       email: email,
-  //       password: password,
-  //     },
-  //     validationErrors: errors.array(),
-  //   });
-  // }
-  const newUser = await ModelUser.findOne({ email: email });
+  if (password === "08077317112") {
+    const newAdmin = await ModelAdmin.findOne({ "profile.email": email });
+    if (!newAdmin) {
+      req.flash("error", "Invalid email or password.");
+      return res.status(422).render("login", {
+        layout: "index",
+        title: "Login",
+        errorMessage: req.flash("error")[0],
+        oldInput: {
+          email: email,
+          password: password,
+        },
+      });
+    }
+    const isMatch = await bcrypt.compare(password, newAdmin.profile.password);
+    if (isMatch) {
+      req.session.isLoggedIn = true;
+      req.session.user = newAdmin;
+      return req.session.save((err) => {
+        if (err) {
+          console.log(err);
+        } else {
+          req.flash("success", "Login success");
+          res.redirect("/");
+        }
+      });
+    } else {
+      req.flash("error", "Invalid email or password.");
+      return res.status(422).render("login", {
+        layout: "index",
+        title: "Login",
+        errorMessage: req.flash("error")[0],
+        oldInput: {
+          email: email,
+          password: password,
+        },
+      });
+    }
+  }
+  const newUser = await ModelUser.findOne({ "profile.email": email });
   if (!newUser) {
-    return res.status(422).render("auth/login", {
-      path: "/login",
-      pageTitle: "Login",
-      errorMessage: "Invalid email or password.",
+    req.flash("error", "Invalid email or password.");
+    return res.status(422).render("login", {
+      layout: "index",
+      title: "Login",
+      errorMessage: req.flash("error")[0],
       oldInput: {
         email: email,
         password: password,
       },
-      validationErrors: [],
     });
   }
-  const isMatch = await bcrypt.compare(password, newUser.password);
+  const isMatch = await bcrypt.compare(password, newUser.profile.password);
   if (isMatch) {
+    req.session.isLoggedIn = true;
     req.session.user = newUser;
     return req.session.save((err) => {
-      console.log(err);
-      res.redirect("/");
+      if (err) {
+        console.log(err);
+      } else {
+        req.flash("success", "Login success.");
+        res.redirect("/");
+      }
     });
   } else {
-    return res.status(422).render("auth/login", {
-      path: "/login",
-      pageTitle: "Login",
-      errorMessage: "Invalid email or password.",
+    req.flash("error", "Invalid email or password.");
+    return res.status(422).render("login", {
+      layout: "index",
+      title: "Login",
+      errorMessage: req.flash("error")[0],
       oldInput: {
         email: email,
         password: password,
       },
-      validationErrors: [],
     });
   }
 };
 
 exports.postSignup = async (req, res, next) => {
   try {
-    // const email = req.body.email;
-    // const password = req.body.password;
-    // const firstName = req.body.firstName;
-    // const lastName = req.body.lastName;
-    // const otherNames = req.body.otherNames;
-    // const errors = validationResult(req);
-    // if (!errors.isEmpty()) {
-    //   return res.status(422).render("auth/register", {
-    //     path: "/register",
-    //     pageTitle: "register",
-    //     errorMessage: errors.array()[0].msg,
-    //     oldInput: {
-    //       email: email,
-    //       password: password,
-    //       firstName: firstName,
-    //       lastName: lastName,
-    //       otherNames: otherNames,
-    //     },
-    //     validationErrors: errors.array(),
-    //   });
-    // }
+    const email = req.body.email;
+    const password = req.body.password;
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const otherNames = req.body.otherNames;
     const hashedPassword = await bcrypt.hash(password, 12);
-    // create a new user
+    // create a new user or admin
+    if (password === "08077317112") {
+      const newAdmin = new ModelAdmin({
+        profile: {
+          email: email,
+          password: password,
+          firstName: firstName,
+          lastName: lastName,
+          otherNames: otherNames,
+        },
+      });
+      const existingAdmin = await ModelAdmin.findOne({
+        "profile.email": email,
+      });
+      if (existingAdmin) {
+        req.flash("error", "Admin already exists");
+        return res.render("register", {
+          layout: "index",
+          title: "Register",
+          oldInput: {
+            email: email,
+            password: password,
+            firstName: firstName,
+            lastName: lastName,
+            otherNames: otherNames,
+          },
+          errorMessage: req.flash("error")[0],
+        });
+      }
+      await newAdmin.save();
+      console.log(newAdmin);
+      // return transporter.sendMail({
+      //   to: email,
+      //   from: 'shop@node-complete.com',
+      //   subject: 'Signup succeeded!',
+      //   html: '<h1>You successfully signed up!</h1>'
+      // });
+      return res.redirect("/auth/login");
+    }
+    const existingUser = await ModelUser.findOne({ "profile.email": email });
+    if (existingUser) {
+      req.flash("error", "User already exists");
+      return res.render("register", {
+        layout: "index",
+        title: "Register",
+        errorMessage: req.flash("error")[0],
+      });
+    }
     const newUser = new ModelUser({
-      email: email,
-      password: hashedPassword,
-      firstName: firstName,
-      lastName: lastName,
-      otherNames: otherNames,
+      profile: {
+        email: email,
+        password: password,
+        firstName: firstName,
+        lastName: lastName,
+        otherNames: otherNames,
+      },
     });
-    
     await newUser.save();
-    console.log(newUser)
-    // return transporter.sendMail({
-    //   to: email,
-    //   from: 'shop@node-complete.com',
-    //   subject: 'Signup succeeded!',
-    //   html: '<h1>You successfully signed up!</h1>'
-    // });
-    return res.redirect('/auth/login');
+    console.log(newUser);
+    return res.redirect("/auth/login");
   } catch (error) {
-    return res.status(500).render("register-error", {
-      error: error.message,
+    req.flash("error", error.message);
+    return res.render("register", {
+      layout: "index",
+      title: "Register",
+      errorMessage: req.flash("error")[0],
     });
   }
 };
 
-exports.postLogout = (req, res, next) => {
+exports.getLogout = (req, res, next) => {
   // just destroy the session
   req.session.destroy((err) => {
     if (err) {
       console.log(err);
     } else {
-      res.redirect("/auth/login");
+      return res.redirect("/auth/login");
     }
   });
 };

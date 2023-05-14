@@ -3,6 +3,35 @@ const Wallet = require("../models/wallet.mongo");
 const admin = require("../models/admin.mongo");
 const Transfer = require("../models/transfer.mongo");
 
+exports.getDeposit = (req, res) => {
+  res.render("deposit", {
+    title: "Deposit",
+    // csrfToken: req.csrfToken()  // deprecate
+  });
+};
+
+exports.getWithdraw = (req, res) => {
+  res.render("withdraw", {
+    title: "Withdraw",
+    // csrfToken: req.csrfToken()  // deprecated
+  });
+};
+
+exports.getTransfer = (req, res) => {
+  res.render("transfer", {
+    title: "Transfer",
+    // csrfToken: req.csrfToken()  // deprecated
+  });
+};
+
+exports.getProfile = (req, res) => {
+  res.render("view-profile", {
+    layout: "profile",
+    title: "Profile",
+    // csrfToken: req.csrfToken()  // deprecated
+  });
+};
+
 // req.body = {amount: N500}
 // user will come from the req.session
 exports.postDeposit = async (req, res, next) => {

@@ -307,6 +307,11 @@
   padding: 5px;
 }
 
+.success-message {
+  color: green;
+  text-align: center;
+}
+
 @media screen and (max-width: 768px) {
   .profile-picture-container {
     width: 80px;

@@ -12,8 +12,7 @@ const modelUserSchema = new mongoose.Schema(
         required: true,
       },
       otherNames: {
-        type: String,
-        required: true,
+        type: String
       },
       password: {
         type: String,
@@ -27,6 +26,10 @@ const modelUserSchema = new mongoose.Schema(
     walletId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Wallet",
+    },
+    status: {
+      type: String,
+      default: "user",
     },
   },
   { timestamps: true }

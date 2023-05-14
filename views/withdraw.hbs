@@ -5,8 +5,7 @@
   <h1 class="section-header">Withdraw</h1>
   <form class="section-form">
     <div class="mb-3 row">
-      <label for="withdrawField" class="col-sm-4 col-form-label">Account
-        Number:</label>
+      <label for="withdrawField" class="col-sm-4 col-form-label">Account Number:</label>
       <div class="col-sm-8">
         <input
           type="text"
@@ -18,7 +17,10 @@
       </div>
     </div>
     <div class="mb-3 row">
-      <label for="withdrawSubmitBtn" class="col-sm-4 col-form-label">Amount</label>
+      <label
+        for="withdrawSubmitBtn"
+        class="col-sm-4 col-form-label"
+      >Amount</label>
       <div class="col-sm-8">
         <input type="text" class="form-control" id="withdrawSubmitBtn" />
       </div>
@@ -26,5 +28,6 @@
     <div class="text-center">
       <button type="submit" class="btn btn-primary">Submit</button>
     </div>
+    {{!-- <input type="hidden" name="_csrf" value="{{csrfToken}}" / deprecated > --}}
   </form>
 </section>

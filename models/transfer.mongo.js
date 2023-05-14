@@ -2,14 +2,22 @@ const mongoose = require("mongoose");
 
 const transferSchema = new mongoose.Schema(
   {
-    from: {
-      type: String,
+    fromWallet: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
     }, // from this account
-    to: {
-      type: String,
+    toWallet: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
     }, // to this account
+    // fromAccount: {
+    //   type: String,
+    //   required: true,
+    // }, // from this account
+    // toAccount: {
+    //   type: String,
+    //   required: true,
+    // }, // to this account
     amount: {
       type: String,
       required: true,
@@ -22,6 +30,6 @@ const transferSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Transfer = mongoose.model("Transfer", transferSchema);
+const transferModel = mongoose.model("Transfer", transferSchema);
 
-module.exports = Transfer;
+module.exports = transferModel;

@@ -6,7 +6,7 @@ const walletSchema = new mongoose.Schema({
     required: true,
   },
   userID: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
@@ -14,62 +14,62 @@ const walletSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  deposits: [
-    {
-      to: {
-        type: Schema.Types.ObjectId,
-        ref: "Wallet",
-        required: true,
-      }, // to this wallet basically
-      amount: {
-        type: Number,
-        required: true,
-      },
-    },
-  ],
-  withdrawals: [
-    {
-      from: {
-        type: Schema.Types.ObjectId,
-        ref: "Wallet",
-        required: true,
-      }, // from this wallet basically
-      amount: {
-        type: Number,
-        required: true,
-      },
-    },
-  ],
-  transfers: [
-    {
-      from: {
-        type: Schema.Types.ObjectId,
-        ref: "Wallet",
-        required: true,
-      }, // from this wallet
-      to: {
-        type: Schema.Types.ObjectId,
-        ref: "Wallet",
-        required: true,
-      }, // to this wallet
-      amount: {
-        type: Number,
-        required: true,
-      },
-      status: {
-        type: String,
-        // enum: ["pending", "approved", "declined"],
-        default: "pending",
-      },
-    },
-  ],
   balance: {
     // wallet balance
-    type: number,
+    type: Number,
     ref: "ModelUser",
     default: 0,
   },
-  pendingBal: [{ type: number }],
+  // pendingBal: [{ type: number }],
+  // deposits: [
+  //   {
+  //     to: {
+  //       type: Schema.Types.ObjectId,
+  //       ref: "Wallet",
+  //       required: true,
+  //     }, // to this wallet basically
+  //     amount: {
+  //       type: Number,
+  //       required: true,
+  //     },
+  //   },
+  // ],
+  // withdrawals: [
+  //   {
+  //     from: {
+  //       type: Schema.Types.ObjectId,
+  //       ref: "Wallet",
+  //       required: true,
+  //     }, // from this wallet basically
+  //     amount: {
+  //       type: Number,
+  //       required: true,
+  //     },
+  //   },
+  // ],
+  // transfers: [
+  //   {
+  //     from: {
+  //       type: Schema.Types.ObjectId,
+  //       ref: "Wallet",
+  //       required: true,
+  //     }, // from this wallet
+  //     to: {
+  //       type: Schema.Types.ObjectId,
+  //       ref: "Wallet",
+  //       required: true,
+  //     }, // to this wallet
+  //     amount: {
+  //       type: Number,
+  //       required: true,
+  //     },
+  //     status: {
+  //       type: String,
+  //       // enum: ["pending", "approved", "declined"],
+  //       default: "pending",
+  //     },
+  //   },
+  // ],
 });
 
 const Wallet = mongoose.model("Wallet", walletSchema);

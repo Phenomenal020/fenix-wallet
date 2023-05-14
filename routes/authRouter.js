@@ -10,7 +10,7 @@ router.get("/login", authController.getLogin);
 router.get("/register", authController.getSignup);
 
 router.post(
-  "/login", 
+  "/login",
   [
     body("email")
       .isEmail()
@@ -23,41 +23,42 @@ router.post(
   ],
   authController.postLogin
 );
-
+// 
 router.post(
   "/register",
-  // [
-  //   check("email")
-  //     .isEmail()
-  //     .withMessage("Please enter a valid email.")
+  [
+    check("email")
+      .isEmail()
+      .withMessage("Please enter a valid email.")
+      .custom((value, { req }) => {
+        return User.findOne({ email: value }).then((userDoc) => {
+          if (userDoc) {
+            return Promise.reject(
+              "E-Mail exists already, please pick a different one."
+            );
+          }
+        });
+      })
+      .normalizeEmail(),
+    body(
+      "password",
+      "Please enter a password with only numbers and text and at least 5 characters."
+    )
+      .isLength({ min: 5 })
+      .isAlphanumeric()
+      .trim(),
+    // body("confirmPassword")
+    //   .trim()
     //   .custom((value, { req }) => {
-    //     return User.findOne({ email: value }).then((userDoc) => {
-    //       if (userDoc) {
-    //         return Promise.reject(
-    //           "E-Mail exists already, please pick a different one."
-    //         );
-    //       }
-    //     });
-    //   })
-//       .normalizeEmail(),
-//     body(
-//       "password",
-//       "Please enter a password with only numbers and text and at least 5 characters."
-//     )
-//       .isLength({ min: 5 })
-//       .isAlphanumeric()
-//       .trim(),
-//     body("confirmPassword")
-//       .trim()
-//       .custom((value, { req }) => {
-//         if (value !== req.body.password) {
-//           throw new Error("Passwords do not match!");
-//         }
-//         return true;
-//       }),
-//   ],
-  authController.postSignup);
+    //     if (value !== req.body.password) {
+    //       throw new Error("Passwords do not match!");
+    //     }
+    //     return true;
+    //   }),
+  ],
+  authController.postSignup
+);
 
-router.get("/logout", authController.postLogout);
+router.get("/logout", authController.getLogout);
 
 module.exports = router;

@@ -1,33 +1,75 @@
 {{!< index }}
 
 <form
-  action="/register" method="post"
+  action="/auth/register"
+  method="post"
   style="width: 30%; border: 1px solid #0a2558; padding: 24px; background-color: #fff; border-radius: 24px"
 >
   <h3 style="text-align: center; margin-bottom: 24px">Register</h3>
+
+  {{#if errorMessage}}
+    <p class="error-message" id="msgBox">
+      {{errorMessage}}
+    </p>
+  {{/if}}
+
   <div class="form-group" style="margin: 12px auto;">
     <label for="firstName">First Name: </label>
-    <input type="text" class="form-control" id="firstName" name="firstName" />
+    <input
+      type="text"
+      class="form-control"
+      id="firstName"
+      name="firstName"
+      aria-required="true"
+      value="{{oldInput.firstName}}"
+    />
   </div>
 
   <div class="form-group" style="margin: 12px auto;">
     <label for="lastName">Last Name: </label>
-    <input type="text" class="form-control" id="lastName" name="lastName" />
+    <input
+      type="text"
+      class="form-control"
+      id="lastName"
+      name="lastName"
+      aria-required="true"
+      value="{{oldInput.lastName}}"
+    />
   </div>
 
   <div class="form-group" style="margin: 12px auto;">
     <label for="otherNames">Other Names: </label>
-    <input type="text" class="form-control" id="otherNames" name="otherNames" />
+    <input
+      type="text"
+      class="form-control"
+      id="otherNames"
+      name="otherNames"
+      value="{{oldInput.otherNames}}"
+    />
   </div>
 
   <div class="form-group" style="margin: 12px auto;">
     <label for="email">Email: </label>
-    <input type="email" class="form-control" id="email" name="email" />
+    <input
+      type="email"
+      class="form-control"
+      id="email"
+      name="email"
+      aria-required="true"
+      value="{{oldInput.email}}"
+    />
   </div>
 
   <div class="form-group" style="margin: 12px auto;">
     <label for="password">Password: </label>
-    <input type="password" class="form-control" id="password" name="password" />
+    <input
+      type="password"
+      class="form-control"
+      id="password"
+      name="password"
+      aria-required="true"
+      value="{{oldInput.password}}"
+    />
   </div>
 
   <div style="display: flex; justify-content: center">
@@ -41,4 +83,26 @@
   <h6 style="margin: 16px; text-align: center">Already have an account?
     <a href="/auth/login" style="text-decoration: none">login</a>
   </h6>
+  {{!-- <input type="hidden" name="_csrf" value="{{csrfToken}}" /> deprecated  --}}
 </form>
+
+<script>
+
+  function clearMsg() {
+    const msgRef = document.querySelector("#msgBox")
+    msgRef.textContent = ""
+  }
+
+  // get the input forms
+  const passwordRef = document.querySelector("#password") 
+  passwordRef.addEventListener("focus", clearMsg)
+  const emailRef = document.querySelector("#email") 
+  emailRef.addEventListener("focus", clearMsg)
+  const lastNameRef = document.querySelector("#lastName") 
+  lastNameRef.addEventListener("focus", clearMsg)
+  const firstNameRef = document.querySelector("#firstName") 
+  firstNameRef.addEventListener("focus", clearMsg)
+  const otherNamesRef = document.querySelector("#otherNames") 
+  otherNamesRef.addEventListener("focus", clearMsg)
+
+</script>
