@@ -4,8 +4,10 @@ const admin = require("../models/admin.mongo");
 const Transfer = require("../models/transfer.mongo");
 const depositModel = require("../models/deposit.mongo");
 const withdrawModel = require("../models/withdraw.mongo");
+const TransferModel = require("../models/transfer.mongo");
 
 exports.getDeposit = async (req, res) => {
+  // get the user's wallet from the session. Use that to render the User's wallet balance
   const wallet = await Wallet.findOne({ userID: req.session.user._id });
   res.render("deposit", {
     title: "Deposit",
@@ -21,6 +23,7 @@ exports.getDeposit = async (req, res) => {
 };
 
 exports.getWithdraw = async (req, res) => {
+  // get the user's wallet from the session. Use that to render the User's wallet balance
   const wallet = await Wallet.findOne({ userID: req.session.user._id });
   res.render("withdraw", {
     title: "Withdraw",
@@ -36,6 +39,7 @@ exports.getWithdraw = async (req, res) => {
 };
 
 exports.getTransfer = async (req, res) => {
+  // get the user's wallet from the session. Use that to render the User's wallet balance
   const wallet = await Wallet.findOne({ userID: req.session.user._id });
   res.render("transfer", {
     title: "Transfer",
@@ -47,6 +51,7 @@ exports.getTransfer = async (req, res) => {
 };
 
 exports.getProfile = (req, res) => {
+  // Get the relavnt information from the session.
   res.render("view-profile", {
     layout: "profile",
     title: "Profile",
@@ -63,21 +68,23 @@ exports.postDeposit = async (req, res, next) => {
   try {
     // get the amount from the req body
     const { amount } = req.body;
+    // convert it to a number
     const amountToNumber = parseInt(amount);
-    // get the user from the req session
+    // get the user from the session
     const user = req.session.user;
-    // use the user to extract the walletId, then find the wallet using that id
+    // use the user to extract the walletId, then find the user's wallet using that id
     const wallet = await Wallet.findOne({ userID: user._id });
     // create a deposit object like this and save to the deposits collections
     // { to: this wallet id, amount: amount}
-    let acctNumber = wallet.accountNumber;
+    let acctNumber = wallet.accountNumber; //copy the account number for rendering later
     const deposit = new depositModel({
       walletId: wallet._id,
       to: wallet.accountNumber,
       amount: amountToNumber,
     });
+    // save the deposit to the db
     await deposit.save();
-    // increase wallet balance by amount
+    // increase wallet balance and total deposits balance by amount
     wallet.totalBalance += amountToNumber;
     wallet.totalDeposits += amountToNumber;
     //   if successful, render a deposit successful alert
@@ -86,6 +93,7 @@ exports.postDeposit = async (req, res, next) => {
       "success",
       `${amountToNumber} successfully deposited to ${acctNumber}`
     );
+    // redirect to the homepage
     return res.redirect("/");
   } catch (error) {
     // handle errors
@@ -94,10 +102,14 @@ exports.postDeposit = async (req, res, next) => {
       title: "Deposit",
       oldInput: {
         amount: amountToNumber,
-        to: acctNumber,
+        to: acctNumber
+          ? acctNumber
+          : req.session
+          ? req.session.user.walletAcctNumber
+          : "",
       },
       errorMessage: req.flash("error")[0],
-      to: req.session.user.walletAcctNumber,
+      firstName: req.session ? req.session.user.profile.firstName : "",
     });
   }
 };
@@ -107,42 +119,48 @@ exports.postDeposit = async (req, res, next) => {
 // to: user will come from the body. it can be email, firstName, or last name
 exports.postTransfer = async (req, res, next) => {
   try {
-    // get the amount from the req body
+    // get the amount and to from the req body
     const { to, amount } = req.body;
+    // convert the amount to number
+    const amountToNumber = parseInt(amount);
+    // Get the reicipient user's wallet using the account number provided
     const recipientWallet = await Wallet.find({ accountNumber: to });
-    if (!recipientWallet) {
-      return res.status(422).render("transfer-failure", {
-        error: "Invalid account number",
-      });
-    }
+    // TODO: flash error and re-render the transfer page
+    // if (!recipientWallet) {
+    //   return res.status(422).render("transfer-failure", {
+    //     error: "Invalid account number",
+    //   });
+    // }
     // get the user from the req session
     const user = req.session.user;
-    // use the user to extract the walletId, then find the wallet using that id
-    const userWallet = await Wallet.findOne({ userID: user.userID });
+    // use the user to extract the walletId, then find the user's wallet using that id
+    const userWallet = await Wallet.findOne({ userID: user._id });
     // create a transfer object like this
     // { from: this wallet id,to: receipent wallet, amount: amount}
     // and
     // save to transfer database
-    if (userWallet.balance >= amount) {
-      const transfer = new Transfer({
+    if (userWallet.totalBalance >= amountToNumber) {
+      const transfer = new TransferModel({
         from: userWallet.accountNumber,
         to: recipientWallet.accountNumber,
         amount: amount,
       });
       // decrease wallet balance by amount
-      userWallet.balance -= amount;
-      // add this to the transfers array of the wallet
-      userWallet.transfers.push(transfer);
-      //await wallet.save();
-      return res.render("/", {
-        message: "transfer successful",
-      });
+      userWallet.totalBalance -= amount;
+      await transfer.save();
+      await userWallet.save();
+      req.flash(
+        "success",
+        `${amountToNumber} successfully transferred to ${to}`
+      );
+      return res.redirect("/");
     } else {
-      req.flash("error", "Wallet balance is insufficient.");
-      res.redirect("/deposit");
+      // TODO: re-render the transfer page, passing in the relevant fields
+      // req.flash("error", "Wallet balance is insufficient.");
+      res.redirect("/actions/deposit");
     }
   } catch (error) {
-    // handle errors
+    //TODO: handle errors
     console.error(error);
     res.status(500).render("error", { error: "Internal server error" });
   }
@@ -226,6 +244,7 @@ exports.updateProfile = async (req, res, next) => {
       accountNumber: respUser.walletAcctNumber,
     });
   } catch (error) {
+    // handle errors
     req.flash("error", error.message);
     res.render("view-profile", {
       layout: "profile",
