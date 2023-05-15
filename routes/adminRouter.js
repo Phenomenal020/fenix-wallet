@@ -7,10 +7,10 @@ const adminController = require("../controllers/adminController");
 
 const router = express.Router();
 
-router.post("/activate", isAuth, adminController.postWallet);
+router.post("/activate",isAuth, adminController.postActivateWallet);
 
 router.post(
-  "/approve", isAuth, adminController.postApproveTransfer
+  "/approve",isAuth, adminController.postApproveTransfer
 );
 
 module.exports = router;

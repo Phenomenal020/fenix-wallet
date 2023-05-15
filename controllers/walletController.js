@@ -1,7 +1,6 @@
 const ModelUser = require("../models/user.mongo");
 const Wallet = require("../models/wallet.mongo");
 const admin = require("../models/admin.mongo");
-const Transfer = require("../models/transfer.mongo");
 const depositModel = require("../models/deposit.mongo");
 const withdrawModel = require("../models/withdraw.mongo");
 const TransferModel = require("../models/transfer.mongo");
@@ -47,6 +46,11 @@ exports.getTransfer = async (req, res) => {
     totalBalance: wallet.totalBalance,
     totalDeposits: wallet.totalDeposits,
     totalWithdrawals: wallet.totalWithdrawals,
+    oldInput: {
+      amount: "",
+      to: "",
+      from: req.session.user.walletAcctNumber,
+    },
   });
 };
 
@@ -65,11 +69,11 @@ exports.getProfile = (req, res) => {
 // req.body = {amount: N500}
 // user will come from the req.session
 exports.postDeposit = async (req, res, next) => {
+  // get the amount from the req body
+  const { amount } = req.body;
+  // convert it to a number
+  const amountToNumber = parseInt(amount);
   try {
-    // get the amount from the req body
-    const { amount } = req.body;
-    // convert it to a number
-    const amountToNumber = parseInt(amount);
     // get the user from the session
     const user = req.session.user;
     // use the user to extract the walletId, then find the user's wallet using that id
@@ -120,17 +124,30 @@ exports.postDeposit = async (req, res, next) => {
 exports.postTransfer = async (req, res, next) => {
   try {
     // get the amount and to from the req body
-    const { to, amount } = req.body;
+    const to = req.body.to;
+    const amount = req.body.amount
     // convert the amount to number
     const amountToNumber = parseInt(amount);
     // Get the reicipient user's wallet using the account number provided
-    const recipientWallet = await Wallet.find({ accountNumber: to });
+    const receiverWallet = await Wallet.findOne({ accountNumber: to });
     // TODO: flash error and re-render the transfer page
-    // if (!recipientWallet) {
-    //   return res.status(422).render("transfer-failure", {
-    //     error: "Invalid account number",
-    //   });
-    // }
+    if (!receiverWallet){
+      req.flash("error", "Account Number does not exist");
+      const wallet = await Wallet.findOne({ userID: req.session.user._id });
+      return res.render("transfer", {
+        title: "Transfer",
+        totalBalance: wallet.totalBalance,
+        totalDeposits: wallet.totalDeposits,
+        totalWithdrawals: wallet.totalWithdrawals,
+        oldInput: {
+          amount: req.body.amount,
+          from: req.session.user.walletAcctNumber,
+          to: req.body.to,
+        },
+        errorMessage: req.flash("error")[0],
+        firstName: req.session ? req.session.user.profile.firstName : "",
+      });
+    }
     // get the user from the req session
     const user = req.session.user;
     // use the user to extract the walletId, then find the user's wallet using that id
@@ -141,14 +158,16 @@ exports.postTransfer = async (req, res, next) => {
     // save to transfer database
     if (userWallet.totalBalance >= amountToNumber) {
       const transfer = new TransferModel({
+        to: receiverWallet.accountNumber,
         from: userWallet.accountNumber,
-        to: recipientWallet.accountNumber,
-        amount: amount,
+        amount: amountToNumber,
       });
       // decrease wallet balance by amount
-      userWallet.totalBalance -= amount;
+      userWallet.totalBalance -= amountToNumber;
+      receiverWallet.totalBalance += amountToNumber;
       await transfer.save();
       await userWallet.save();
+      await receiverWallet.save();
       req.flash(
         "success",
         `${amountToNumber} successfully transferred to ${to}`
@@ -157,12 +176,40 @@ exports.postTransfer = async (req, res, next) => {
     } else {
       // TODO: re-render the transfer page, passing in the relevant fields
       // req.flash("error", "Wallet balance is insufficient.");
-      res.redirect("/actions/deposit");
+      req.flash("error", error.message);
+      const wallet = await Wallet.findOne({ userID: req.session.user._id });
+      res.render("transfer", {
+        title: "Transfer",
+        oldInput: {
+          amount: amountToNumber,
+          from: req.session.user.walletAcctNumber,
+          to: to,
+        },
+        totalBalance: wallet.totalBalance,
+        totalDeposits: wallet.totalDeposits,
+        totalWithdrawals: wallet.totalWithdrawals,
+        errorMessage: req.flash("error")[0],
+        firstName: req.session ? req.session.user.profile.firstName : "",
+      });
     }
   } catch (error) {
     //TODO: handle errors
     console.error(error);
-    res.status(500).render("error", { error: "Internal server error" });
+    req.flash("error", error.message);
+    const wallet = await Wallet.findOne({ userID: req.session.user._id });
+    res.render("transfer", {
+      title: "Transfer",
+      totalBalance: wallet.totalBalance,
+      totalDeposits: wallet.totalDeposits,
+      totalWithdrawals: wallet.totalWithdrawals,
+      oldInput: {
+        amount: req.body.amount,
+        from: req.session.user.walletAcctNumber,
+        to: req.body.to,
+      },
+      errorMessage: req.flash("error")[0],
+      firstName: req.session ? req.session.user.profile.firstName : "",
+    });
   }
 };
 

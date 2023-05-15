@@ -2,24 +2,16 @@ const mongoose = require("mongoose");
 
 const transferSchema = new mongoose.Schema(
   {
-    fromWallet: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-    }, // from this account
-    toWallet: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-    }, // to this account
-    // fromAccount: {
-    //   type: String,
-    //   required: true,
-    // }, // from this account
-    // toAccount: {
-    //   type: String,
-    //   required: true,
-    // }, // to this account
-    amount: {
+    from: {
       type: String,
+      required: true,
+    }, 
+    to: {
+      type: String,
+      required: true,
+    }, 
+    amount: {
+      type: Number,
       required: true,
     },
     status: {
