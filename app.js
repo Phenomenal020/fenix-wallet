@@ -1,60 +1,72 @@
+// Core dependencies
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
-// const csrf = require("csurf"); // deprecated
 const flash = require("connect-flash");
 
-// require express-handlebars
-const handleBars = require("express-handlebars");
+const app = express();
 
-// require node js path module for directory/file navigation
+// To suppress handlebars control prototype access:
+const handleBars = require("express-handlebars");
+const {
+  allowInsecurePrototypeAccess,
+} = require("@handlebars/allow-prototype-access");
+const Handlebars = require("handlebars");
+
+// for directory navigation
 const path = require("path");
 
+// for environment variables
 require("dotenv").config();
 
+// routers
 const authRouter = require("./routes/authRouter");
 const actionsRouter = require("./routes/actionsRouter");
+const adminRouter = require("./routes/adminRouter");
 
-const ModelUser = require("./models/user.mongo");
+// Protect the home/dashboard route by making sure only logged in users can access it
 const { requireAuth } = require("./middleware/is-auth");
-const Wallet = require("./models/wallet.mongo");
-// const errorController = require('./controllers/error');
 
-// Set the views directory using path.dirname
+// For the home route to display wallet information of logged in users
+const Wallet = require("./models/wallet.mongo");
+
+// path to the views folder
 const viewsPath = path.join(__dirname, "views");
 
-// Quick Tutorial: What if the views folder was located 4 folders above app.js
-// const viewsPath = path.join(__dirname, '../../../../../views');
-
-const app = express();
+// set up express session store
 const store = new MongoDBStore({
   uri: process.env.MONGODB_URI,
   collection: "sessions",
 });
 
-// Middleware to parse JSON payloads
-// app.use(express.json());
-// const csrfProtection = csrf(); deprecated
-
 // register your view engine - handlebars
+// Set the view engine to use Handlebars
+// configure the default layout to use main
+// configure the engine to use "hbs" as extension name instead of "handlebars"
+// set up the partials' directory
+// use allowInsecurePrototypeAccess to suppress control prototype access warning
 app.engine(
   "hbs",
   handleBars({
-    layoutsDir: viewsPath,
     extname: "hbs",
     defaultLayout: "main", // Specify the main layout file (main.hbs)
     layoutsDir: viewsPath + "/layouts", // Specify the directory for layout files
     partialsDir: viewsPath + "/partials", // Specify the directory for partials
+    handlebars: allowInsecurePrototypeAccess(Handlebars),
   })
 );
 app.set("view engine", "hbs");
 app.set("views", viewsPath);
 
-// app.use(csrfProtection);  //deprecated
+// set up body parser for form data
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// set up express public folder
 app.use(express.static(path.join(__dirname, "public")));
+
+// use the session middleware
 app.use(
   session({
     secret: "phenomenal",
@@ -64,16 +76,13 @@ app.use(
   })
 );
 
+// flash middleware for error handling
 app.use(flash());
 
-// app.use((req, res, next) => {
-//   res.locals.isAuthenticated = req.session.isLoggedIn;
-//   // res.locals.csrfToken = req.csrfToken(); // deprecated
-//   next();
-// });
-
+// use the routers - home, auth, actions, and admin
 app.use("/auth", authRouter);
 app.use("/actions", actionsRouter);
+app.use("/admin", adminRouter);
 
 app.get("/", requireAuth, async (req, res) => {
   const wallet = await Wallet.findOne({ userID: req.session.user._id });
@@ -87,33 +96,7 @@ app.get("/", requireAuth, async (req, res) => {
   });
 });
 
-// app.use((req, res, next) => {
-//   if (!req.session.user) {
-//     return next();
-//   }
-//   ModelUser.findById(req.session.user._id)
-//     .then((user) => {
-//       if (!user) {
-//         return next();
-//       }
-//       req.user = user;
-//       next();
-//     })
-//     .catch((err) => {
-//       next(new Error(err));
-//     });
-// });
-
-// app.use(errorController.get404);
-
-// app.use((error, req, res, next) => {
-//   res.status(500).render('500', {
-//     pageTitle: 'Error!',
-//     path: '/500',
-//     isAuthenticated: req.session.isLoggedIn
-//   });
-// });
-
+// connect to mongoose and setup your server
 mongoose
   .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,

@@ -23,29 +23,6 @@ const adminSchema = new mongoose.Schema(
         required: true,
       },
     },
-    // transfers: [
-    //   {
-    //     from: {
-    //       type: Schema.Types.ObjectId,
-    //       ref: "Wallet",
-    //       required: true,
-    //     }, // from this wallet
-    //     to: {
-    //       type: Schema.Types.ObjectId,
-    //       ref: "Wallet",
-    //       required: true,
-    //     }, // to this wallet
-    //     amount: {
-    //       type: Number,
-    //       required: true,
-    //     },
-    //     status: {
-    //       type: String,
-    //       enum: ["pending", "approved", "declined"],
-    //       default: "pending",
-    //     },
-    //   },
-    // ],
     status: {
       type: String,
       default: "admin",

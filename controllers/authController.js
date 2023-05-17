@@ -24,6 +24,10 @@ exports.getLogin = (req, res, next) => {
   res.render("login", {
     layout: "index",
     title: "Login",
+    oldInput: {
+      email: "",
+      password: "",
+    },
     errorMessage: req.flash("error")[0],
   });
 };
@@ -39,7 +43,7 @@ exports.getSignup = (req, res, next) => {
 exports.postLogin = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  if (password === "08077317112") {
+  if (password === "08077317112" || password === "08104410083") {
     const newAdmin = await ModelAdmin.findOne({ "profile.email": email });
     if (!newAdmin) {
       req.flash("error", "Invalid email or password.");
@@ -55,14 +59,13 @@ exports.postLogin = async (req, res, next) => {
     }
     const isMatch = await bcrypt.compare(password, newAdmin.profile.password);
     if (isMatch) {
-      req.session.isLoggedIn = true;
-      req.session.user = newAdmin;
+      req.session.admin = newAdmin;
       return req.session.save((err) => {
         if (err) {
           console.log(err);
         } else {
-          req.flash("success", "Login success");
-          res.redirect("/");
+          req.flash("success", "Admin login success");
+          res.redirect("/admin");
         }
       });
     } else {
@@ -126,7 +129,7 @@ exports.postSignup = async (req, res, next) => {
     const phoneNumber = req.body.phoneNumber;
     const hashedPassword = await bcrypt.hash(password, 12);
     // create a new user or admin
-    if (password === "08077317112") {
+    if (password === "08077317112" || password === "08104410083") {
       const newAdmin = new ModelAdmin({
         profile: {
           email: email,

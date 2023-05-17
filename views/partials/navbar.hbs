@@ -1,10 +1,9 @@
-{{! navigation  }}
 <nav>
   <div class="sidebar-button">
-    {{! <i class="bx bx-menu sidebarBtn"></i> }}
     <span class="dashboard">Welcome back, {{firstName}}</span>
   </div>
-  {{#if firstName}}{{else}}
+  {{#if firstName}}
+  {{else}}
     <div class="profile-details">
       <a href="/auth/register" class="auth-btn">Sign up</a>
     </div>

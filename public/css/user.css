@@ -224,11 +224,11 @@
 }
 
 .date {
-  flex-basis: 20%;
+  flex-basis: 25%;
 }
 
 .status {
-  flex-basis: 20%;
+  flex-basis: 25%;
   text-align: center;
 }
 
@@ -238,7 +238,7 @@
 }
 
 .amount {
-  flex-basis: 30%;
+  flex-basis: 25%;
   text-align: right;
 }
 
@@ -248,6 +248,14 @@
   width: 60%;
   margin: 24px auto 8px auto;
   /* background-color: red; */
+}
+
+/* approve section */
+.admin-date,
+.admin-from,
+.admin-to,
+.admin-amount {
+  flex-basis: 25%;
 }
 
 .section-header {

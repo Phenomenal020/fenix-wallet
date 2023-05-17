@@ -30,7 +30,11 @@ const modelUserSchema = new mongoose.Schema(
     // },
     walletAcctNumber: {
       type: String,
-      required: true
+      required: true,
+    },
+    active: {
+      type: Boolean,
+      default: false,
     },
     status: {
       type: String,

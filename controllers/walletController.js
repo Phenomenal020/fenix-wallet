@@ -8,13 +8,14 @@ const TransferModel = require("../models/transfer.mongo");
 exports.getDeposit = async (req, res) => {
   // get the user's wallet from the session. Use that to render the User's wallet balance
   const wallet = await Wallet.findOne({ userID: req.session.user._id });
+  // Then render the deposit template
   res.render("deposit", {
     title: "Deposit",
     oldInput: {
       amount: null,
       to: req.session.user.walletAcctNumber,
     },
-    firstName: req.session ? req.session.user.profile.firstName : "",
+    firstName: req.session.user.profile.firstName,
     totalBalance: wallet.totalBalance,
     totalDeposits: wallet.totalDeposits,
     totalWithdrawals: wallet.totalWithdrawals,
@@ -24,13 +25,14 @@ exports.getDeposit = async (req, res) => {
 exports.getWithdraw = async (req, res) => {
   // get the user's wallet from the session. Use that to render the User's wallet balance
   const wallet = await Wallet.findOne({ userID: req.session.user._id });
+  // then render the withdraw template
   res.render("withdraw", {
     title: "Withdraw",
     oldInput: {
       amount: null,
       from: req.session.user.walletAcctNumber,
     },
-    firstName: req.session ? req.session.user.profile.firstName : "",
+    firstName: req.session.user.profile.firstName,
     totalBalance: wallet.totalBalance,
     totalDeposits: wallet.totalDeposits,
     totalWithdrawals: wallet.totalWithdrawals,
@@ -59,7 +61,7 @@ exports.getProfile = (req, res) => {
   res.render("view-profile", {
     layout: "profile",
     title: "Profile",
-    firstName: req.session ? req.session.user.profile.firstName : "",
+    firstName: req.session.user.profile.firstNam,
     lastName: req.session.user.profile.lastName,
     email: req.session.user.profile.email,
     accountNumber: req.session.user.walletAcctNumber,
@@ -74,6 +76,13 @@ exports.postDeposit = async (req, res, next) => {
   // convert it to a number
   const amountToNumber = parseInt(amount);
   try {
+<<<<<<< Updated upstream
+=======
+    // get the amount from the req body
+    const amount = req.body.amount;
+    // convert it to a number
+    const amountToNumber = parseInt(amount);
+>>>>>>> Stashed changes
     // get the user from the session
     const user = req.session.user;
     // use the user to extract the walletId, then find the user's wallet using that id
@@ -106,19 +115,15 @@ exports.postDeposit = async (req, res, next) => {
       title: "Deposit",
       oldInput: {
         amount: amountToNumber,
-        to: acctNumber
-          ? acctNumber
-          : req.session
-          ? req.session.user.walletAcctNumber
-          : "",
+        to: req.session.user.walletAcctNumber,
       },
       errorMessage: req.flash("error")[0],
-      firstName: req.session ? req.session.user.profile.firstName : "",
+      firstName: req.session.user.profile.firstName,
     });
   }
 };
 
-// amount: from req.body
+// amount: from req.body0
 // from: user will come from the req.session
 // to: user will come from the body. it can be email, firstName, or last name
 exports.postTransfer = async (req, res, next) => {
@@ -163,11 +168,19 @@ exports.postTransfer = async (req, res, next) => {
         amount: amountToNumber,
       });
       // decrease wallet balance by amount
+<<<<<<< Updated upstream
       userWallet.totalBalance -= amountToNumber;
       receiverWallet.totalBalance += amountToNumber;
       await transfer.save();
       await userWallet.save();
       await receiverWallet.save();
+=======
+      userWallet.totalBalance -= amount;
+      recipientWallet.totalDeposits += amount;
+      await transfer.save();
+      await userWallet.save();
+      await recipientWallet.save();
+>>>>>>> Stashed changes
       req.flash(
         "success",
         `${amountToNumber} successfully transferred to ${to}`
@@ -218,7 +231,7 @@ exports.postTransfer = async (req, res, next) => {
 exports.postWithdraw = async (req, res, next) => {
   try {
     // get the amount from the req body
-    const { amount } = req.body;
+    const amount = req.body.amount;
     // get the user from the req session
     const user = req.session.user;
     const amountToNumber = parseInt(amount);
@@ -238,7 +251,7 @@ exports.postWithdraw = async (req, res, next) => {
       wallet.totalBalance -= amountToNumber;
       wallet.totalWithdrawals += amountToNumber;
       await wallet.save();
-      //   if successful, render a deposit successful alert
+      //   if successful, render a withdrawal successful alert
       req.flash(
         "success",
         `${amountToNumber} successfully withdrawn from ${acctNumber}`

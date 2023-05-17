@@ -10,10 +10,6 @@ const walletSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  active: {
-    type: Boolean,
-    default: false,
-  },
   totalBalance: {
     // wallet balance
     type: Number,

@@ -1,11 +1,16 @@
-{{! sidebar }}
-<a class="logo-wrapper" href="/">
-  {{! <a> }}
-  <i class="bx bxl-c-plus-plus" style="color: #fff; font-size: 28px"></i>
-  <span class="fenix-logo">Fenix-Wallet</span>
-  {{! </a> }}
-</a>
+{{#if admin}}
+  <a class="logo-wrapper" href="/admin">
+    <i class="bx bxl-c-plus-plus" style="color: #fff; font-size: 28px"></i>
+    <span class="fenix-logo">Fenix-Wallet</span>
+  </a>
+{{else}}
+  <a class="logo-wrapper" href="/">
+    <i class="bx bxl-c-plus-plus" style="color: #fff; font-size: 28px"></i>
+    <span class="fenix-logo">Fenix-Wallet</span>
+  </a>
+{{/if}}
 
+<<<<<<< Updated upstream
 {{! other sections }}
 {{#if admin.status}}
 <ul class="nav-links">
@@ -57,3 +62,61 @@
 {{/if}} 
 
 
+=======
+{{#if admin}}
+  <ul class="nav-links">
+    <li>
+      <a href="/admin/approve">
+        <i class="bx bx-list-ul"></i>
+        <span class="links_name">Approve</span>
+      </a>
+    </li>
+    <li>
+      <a href="/admin/activate">
+        <i class="bx bx-list-ul"></i>
+        <span class="links_name">Activate</span>
+      </a>
+    </li>
+    <li class="log_out">
+      <a href="/auth/logout">
+        <i class="bx bx-log-out"></i>
+        <span class="links_name">Log out</span>
+      </a>
+    </li>
+  </ul>
+{{else}}
+  <ul class="nav-links">
+    <li>
+      <a href="/actions/deposit">
+        <i class="bx bx-list-ul"></i>
+        <span class="links_name">Deposit</span>
+      </a>
+    </li>
+    <li>
+      <a href="/actions/withdraw">
+        <i class="bx bx-pie-chart-alt-2"></i>
+        <span class="links_name">Withdraw</span>
+      </a>
+    </li>
+    <li>
+      <a href="/actions/transfer">
+        <i class="bx bx-coin-stack"></i>
+        <span class="links_name">Transfer</span>
+      </a>
+    </li>
+    <li>
+      <a href="/actions/profile">
+        <i class="bx bx-book-alt"></i>
+        <span class="links_name">View Profile</span>
+      </a>
+    </li>
+    <li class="log_out">
+      <a href="/auth/logout">
+        <i class="bx bx-log-out"></i>
+        <span class="links_name">Log out</span>
+      </a>
+    </li>
+  </ul>
+{{/if}}
+{{! other sections }}
+>>>>>>> Stashed changes
