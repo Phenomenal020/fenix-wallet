@@ -8,17 +8,9 @@ const Wallet = require("../models/wallet.mongo");
 
 const router = express.Router();
 
-<<<<<<< Updated upstream
-router.post("/activate",isAuth, adminController.postActivateWallet);
-
-router.post(
-  "/approve",isAuth, adminController.postApproveTransfer
-);
-=======
 router.get("/", requireAdmin, adminController.getHome);
 
 router.get("/approve", requireAdmin, adminController.getApprove);
->>>>>>> Stashed changes
 
 router.get("/activate", requireAdmin, adminController.getActivateWallet);
 

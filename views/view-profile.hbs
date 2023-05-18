@@ -10,7 +10,7 @@
     <p class="success-message" id="msgBox">{{successMessage}}</p>
   {{/if}}
 
-  <div class="profile-picture-container">
+  {{! <div class="profile-picture-container">
     <div class="profile-picture-wrapper">
       <img
         src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
@@ -18,13 +18,34 @@
         alt="Profile Picture"
       />
       <div>
-        {{! <input type="text" /> }}
-        {{! <i class="bi bi-camera-fill camera-icon"></i> }}
+        <input type="file" accept=".gif,.jpg,.png,.tif|image/*" />
+        <i class="bi bi-camera-fill camera-icon"></i>
       </div>
     </div>
-  </div>
+  </div> }}
 
-  <form method="post" action="/actions/profile">
+  <form method="post" action="/actions/profile" enctype="multipart/form-data">
+
+    <div class="card-body rounded-0">
+      <div id="AvatarFileUpload">
+        <div class="selected-image-holder">
+          <label for="image">
+            <img
+              src="/uploads/{{imageUrl}}"
+              alt="profile picture"
+              name="image"
+            />
+          </label>
+
+        </div>
+        <div class="avatar-selector">
+          <label for="image">
+            <i class="bx bxs-camera-plus" style="font-size: 32px;"></i></label>
+          <input type="file" id="image" name="image" style="display: none" />
+        </div>
+      </div>
+    </div>
+
     <div class="form-group" style="margin: 12px auto;">
       <label for="firstName">First Name</label>
       <input

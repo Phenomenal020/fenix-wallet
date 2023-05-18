@@ -37,12 +37,34 @@ exports.getSignup = (req, res, next) => {
     layout: "index",
     title: "Register",
     errorMessage: req.flash("error")[0],
+    oldInput: {
+      email: "",
+      password: "",
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+    },
+    validationErrors: [],
   });
 };
 
 exports.postLogin = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+  //checking if the field is empty, it then renders the signup page with errors
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    return res.status(422).render("login", {
+      layout: "index",
+      title: "Login",
+      errorMessage: errors.array()[0].msg,
+      oldInput: {
+        email: email,
+        password: password,
+      },
+    });
+  }
   if (password === "08077317112" || password === "08104410083") {
     const newAdmin = await ModelAdmin.findOne({ "profile.email": email });
     if (!newAdmin) {
@@ -68,18 +90,17 @@ exports.postLogin = async (req, res, next) => {
           res.redirect("/admin");
         }
       });
-    } else {
-      req.flash("error", "Invalid email or password.");
-      return res.status(422).render("login", {
-        layout: "index",
-        title: "Login",
-        errorMessage: req.flash("error")[0],
-        oldInput: {
-          email: email,
-          password: password,
-        },
-      });
     }
+    req.flash("error", "Invalid email or password.");
+    return res.status(422).render("login", {
+      layout: "index",
+      title: "Login",
+      errorMessage: req.flash("error")[0],
+      oldInput: {
+        email: email,
+        password: password,
+      },
+    });
   }
   const newUser = await ModelUser.findOne({ "profile.email": email });
   if (!newUser) {
@@ -106,28 +127,43 @@ exports.postLogin = async (req, res, next) => {
         res.redirect("/");
       }
     });
-  } else {
-    req.flash("error", "Invalid email or password.");
-    return res.status(422).render("login", {
-      layout: "index",
-      title: "Login",
-      errorMessage: req.flash("error")[0],
-      oldInput: {
-        email: email,
-        password: password,
-      },
-    });
   }
+  req.flash("error", "Invalid email or password.");
+  return res.status(422).render("login", {
+    layout: "index",
+    title: "Login",
+    errorMessage: req.flash("error")[0],
+    oldInput: {
+      email: email,
+      password: password,
+    },
+  });
 };
 
 exports.postSignup = async (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  const firstName = req.body.firstName;
+  const lastName = req.body.lastName;
+  const phoneNumber = req.body.phoneNumber;
+  const hashedPassword = await bcrypt.hash(password, 12);
   try {
-    const email = req.body.email;
-    const password = req.body.password;
-    const firstName = req.body.firstName;
-    const lastName = req.body.lastName;
-    const phoneNumber = req.body.phoneNumber;
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).render("register", {
+        layout: "index",
+        title: "Register",
+        errorMessage: errors.array()[0].msg,
+        oldInput: {
+          email: email,
+          password: password,
+          firstName: firstName,
+          lastName: lastName,
+          phoneNumber: phoneNumber,
+        },
+        validationErrors: errors.array(),
+      });
+    }
     // create a new user or admin
     if (password === "08077317112" || password === "08104410083") {
       const newAdmin = new ModelAdmin({
@@ -136,6 +172,7 @@ exports.postSignup = async (req, res, next) => {
           password: hashedPassword,
           firstName: firstName,
           lastName: lastName,
+          phoneNumber: phoneNumber,
         },
       });
       const existingAdmin = await ModelAdmin.findOne({
@@ -151,6 +188,7 @@ exports.postSignup = async (req, res, next) => {
             password: password,
             firstName: firstName,
             lastName: lastName,
+            phoneNumber: phoneNumber,
           },
           errorMessage: req.flash("error")[0],
         });
@@ -171,6 +209,13 @@ exports.postSignup = async (req, res, next) => {
       return res.render("register", {
         layout: "index",
         title: "Register",
+        oldInput: {
+          email: email,
+          password: password,
+          firstName: firstName,
+          lastName: lastName,
+          phoneNumber: phoneNumber,
+        },
         errorMessage: req.flash("error")[0],
       });
     }
@@ -198,6 +243,13 @@ exports.postSignup = async (req, res, next) => {
       layout: "index",
       title: "Register",
       errorMessage: req.flash("error")[0],
+      oldInput: {
+        email: email,
+        password: password,
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: phoneNumber,
+      },
     });
   }
 };

@@ -3,7 +3,6 @@ const ModelAdmin = require("../models/admin.mongo");
 const bcrypt = require("bcryptjs");
 const TransferModel = require("../models/transfer.mongo");
 const ModelUser = require("../models/user.mongo");
-const { Model } = require("mongoose");
 
 // const { validationResult } = require("express-validator/check");
 exports.getHome = async (req, res) => {
@@ -205,9 +204,11 @@ exports.postActivateWallet = async (req, res, next) => {
 };
 
 exports.postApproveTransfer = async (req, res, next) => {
-  const _id = req.body._id;
+  const transferString = req.body.transferString;
   try {
-    const newTransfer = await Wallet.findOne({ _id: _id });
+    const newTransfer = await TransferModel.findOne({
+      transferString: transferString,
+    });
     if (!newTransfer) {
       const resultBal = await Wallet.aggregate([
         { $group: { _id: null, totalBalanceSum: { $sum: "$totalBalance" } } },
@@ -251,6 +252,8 @@ exports.postApproveTransfer = async (req, res, next) => {
         },
       },
     ]);
+    newTransfer.status = "approved";
+    const resp = await newTransfer.save();
     const transfers = await TransferModel.find({ status: "pending" });
     req.flash("error", "Transfer invalid");
     let firstName = req.session.admin.profile.firstName;

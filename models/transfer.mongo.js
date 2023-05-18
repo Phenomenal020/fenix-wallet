@@ -3,8 +3,6 @@ const mongoose = require("mongoose");
 const transferSchema = new mongoose.Schema(
   {
     from: {
-<<<<<<< Updated upstream
-=======
       type: String,
       required: true,
     },
@@ -13,16 +11,11 @@ const transferSchema = new mongoose.Schema(
       required: true,
     },
     amount: {
->>>>>>> Stashed changes
       type: String,
       required: true,
-    }, 
-    to: {
+    },
+    transferString: {
       type: String,
-      required: true,
-    }, 
-    amount: {
-      type: Number,
       required: true,
     },
     status: {

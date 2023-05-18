@@ -66,11 +66,13 @@
 </div>
 
 <script>
-  // Get all the approval forms const approvalForms =
-  document.querySelectorAll('.activate-form'); // Add event listener to each
-  form approvalForms.forEach(form => { form.addEventListener('submit', event =>
-  { // Prevent the form from submitting immediately event.preventDefault(); //
-  Show a confirmation prompt const shouldApprove = confirm('Do you want to
-  approve this transfer?'); // Proceed with form submission if confirmed if
-  (shouldApprove) { form.submit(); } }); });
+  const approvalForms = document.querySelectorAll('.activate-form'); approvalForms.forEach(form => {
+     form.addEventListener('submit', event => {  
+      event.preventDefault();
+      const shouldApprove = confirm('Do you want to approve this transfer');
+      if (shouldApprove) { 
+        form.submit(); 
+      } 
+    }); 
+  });
 </script>

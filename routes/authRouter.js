@@ -15,29 +15,23 @@ router.post(
       .isEmail()
       .withMessage("Please enter a valid email address.")
       .normalizeEmail(),
-    body("password", "Password has to be valid.")
+    body(
+      "password",
+      "Please enter a password with only numbers and text and at least 5 characters."
+    )
       .isLength({ min: 5 })
       .isAlphanumeric()
       .trim(),
   ],
   authController.postLogin
 );
-// 
+
 router.post(
   "/register",
   [
-    check("email")
+    body("email")
       .isEmail()
-      .withMessage("Please enter a valid email.")
-      .custom((value, { req }) => {
-        return User.findOne({ email: value }).then((userDoc) => {
-          if (userDoc) {
-            return Promise.reject(
-              "E-Mail exists already, please pick a different one."
-            );
-          }
-        });
-      })
+      .withMessage("Please enter a valid email address.")
       .normalizeEmail(),
     body(
       "password",
@@ -46,14 +40,9 @@ router.post(
       .isLength({ min: 5 })
       .isAlphanumeric()
       .trim(),
-    // body("confirmPassword")
-    //   .trim()
-    //   .custom((value, { req }) => {
-    //     if (value !== req.body.password) {
-    //       throw new Error("Passwords do not match!");
-    //     }
-    //     return true;
-    //   }),
+    body("phoneNumber", "Phone number must be 11 digit numbers").matches(
+      /^\d{11}$/
+    ),
   ],
   authController.postSignup
 );

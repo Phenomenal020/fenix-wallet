@@ -23,11 +23,10 @@ const modelUserSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
+      imageUrl: {
+        type: String,
+      },
     },
-    // walletId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   required: true,
-    // },
     walletAcctNumber: {
       type: String,
       required: true,

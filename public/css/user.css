@@ -224,11 +224,11 @@
 }
 
 .date {
-  flex-basis: 25%;
+  flex-basis: 20%;
 }
 
 .status {
-  flex-basis: 25%;
+  flex-basis: 20%;
   text-align: center;
 }
 
@@ -238,7 +238,7 @@
 }
 
 .amount {
-  flex-basis: 25%;
+  flex-basis: 30%;
   text-align: right;
 }
 
@@ -248,14 +248,6 @@
   width: 60%;
   margin: 24px auto 8px auto;
   /* background-color: red; */
-}
-
-/* approve section */
-.admin-date,
-.admin-from,
-.admin-to,
-.admin-amount {
-  flex-basis: 25%;
 }
 
 .section-header {
@@ -281,7 +273,7 @@
   border-radius: 24px;
 }
 
-.profile-picture-container {
+/* .profile-picture-container {
   width: 100%;
   padding: 16px;
   display: flex;
@@ -302,27 +294,78 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
+} */
 
-.camera-icon {
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  font-size: 1.5rem;
-  color: white;
-  background-color: black;
+/* Avatar File Input Wrapper */
+div#AvatarFileUpload {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  background: #f9f9f9;
+  border: 3px solid #bbb;
   border-radius: 50%;
-  padding: 5px;
+  margin: auto;
+  /* background-color: yellow; */
+}
+/* Image Preview Wrapper and Container */
+div#AvatarFileUpload > .selected-image-holder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50% 50%;
+}
+div#AvatarFileUpload > .selected-image-holder {
+  width: 100%; 
+  overflow: hidden;
+}
+div#AvatarFileUpload > .selected-image-holder > label > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-fit: center center;
 }
 
+/* Image Selector to Browse Image to Upload */
+div#AvatarFileUpload > .avatar-selector {
+  position: absolute;
+  bottom: 8px;
+  right: 19%;
+  width: 20px;
+  height: 20px;
+}
+div#AvatarFileUpload > .avatar-selector > .avatar-selector-btn {
+  width: 100%;
+  height: 100%;
+  background: #f5f5f59e;
+  /* padding: 5px 7px; */
+  border-radius: 50% 50%;
+}
+div#AvatarFileUpload > .avatar-selector > .avatar-selector-btn > img {
+  width: 100%;
+  height: 100%;
+  object-fit: scale-down;
+  object-position: center center;
+  z-index: 1;
+}
+.invalid {
+  border-color: red;
+}
 .success-message {
   color: green;
   text-align: center;
+  margin-top: 30px;
+  font-size: 24px;
+  width: 100%;
+  font-weight: bold;
+  border: 2px solid #0a255898;
 }
 
 .error-message {
   color: red;
   text-align: center;
+  margin-top: 30px;
+  font-size: 24px;
+  font-weight: bold;
+  border: 2px solid #0a255898;
 }
 
 @media screen and (max-width: 768px) {

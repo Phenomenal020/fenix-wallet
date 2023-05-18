@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const flash = require("connect-flash");
+const multer = require("multer");
 
 const app = express();
 
@@ -34,6 +35,7 @@ const Wallet = require("./models/wallet.mongo");
 
 // path to the views folder
 const viewsPath = path.join(__dirname, "views");
+const uploadPath = path.join(__dirname, "public", "uploads");
 
 // set up express session store
 const store = new MongoDBStore({
@@ -60,11 +62,42 @@ app.engine(
 app.set("view engine", "hbs");
 app.set("views", viewsPath);
 
+// Set up Multer storage
+const fileStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadPath);
+  },
+  // Generate a unique filename with timestamps in the beginning
+  filename: function (req, file, cb) {
+    // Generate a unique filename
+    // const timestamp = new Date().toISOString();
+    const filename = file.originalname;
+    cb(null, filename);
+  },
+});
+
+// File filter function
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/jpg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 // set up body parser for form data
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // set up express public folder
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
 
 // use the session middleware
 app.use(
