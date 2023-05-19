@@ -4,53 +4,111 @@ const depositModel = require("../models/deposit.mongo");
 const withdrawModel = require("../models/withdraw.mongo");
 const TransferModel = require("../models/transfer.mongo");
 const { v4: uuidv4 } = require("uuid");
+const numeral = require("numeral");
 
 exports.getDeposit = async (req, res) => {
+  const user = req.session.user;
+  const checkUser = await ModelUser.findOne({
+    "profile.email": user.profile.email,
+  });
+  if (!checkUser.active) {
+    let firstName = req.session.user.profile.firstName;
+    return res.render("deposit", {
+      title: "Deposit",
+      oldInput: {
+        amount: null,
+        to: req.session.user.walletAcctNumber,
+      },
+      firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
+      totalBalance: 0,
+      totalDeposits: 0,
+      totalWithdrawals: 0,
+      accountInactive: true,
+    });
+  }
   // get the user's wallet from the session. Use that to render the User's wallet balance
   const wallet = await Wallet.findOne({ userID: req.session.user._id });
   // Then render the deposit template
   let firstName = req.session.user.profile.firstName;
-  res.render("deposit", {
+  return res.render("deposit", {
     title: "Deposit",
     oldInput: {
       amount: null,
       to: req.session.user.walletAcctNumber,
     },
     firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
-    totalBalance: wallet.totalBalance,
-    totalDeposits: wallet.totalDeposits,
-    totalWithdrawals: wallet.totalWithdrawals,
+    totalBalance: numeral(wallet.totalBalance).format("0,0"),
+    totalDeposits: numeral(wallet.totalDeposits).format("0,0"),
+    totalWithdrawals: numeral(wallet.totalWithdrawals).format("0,0"),
   });
 };
 
 exports.getWithdraw = async (req, res) => {
+  const user = req.session.user;
+  const checkUser = await ModelUser.findOne({
+    "profile.email": user.profile.email,
+  });
+  if (!checkUser.active) {
+    let firstName = req.session.user.profile.firstName;
+    return res.render("withdraw", {
+      title: "Withdraw",
+      oldInput: {
+        amount: null,
+        from: req.session.user.walletAcctNumber,
+      },
+      firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
+      totalBalance: 0,
+      totalDeposits: 0,
+      totalWithdrawals: 0,
+      accountInactive: true,
+    });
+  }
   // get the user's wallet from the session. Use that to render the User's wallet balance
   const wallet = await Wallet.findOne({ userID: req.session.user._id });
   // then render the withdraw template
   let firstName = req.session.user.profile.firstName;
-  res.render("withdraw", {
+  return res.render("withdraw", {
     title: "Withdraw",
     oldInput: {
       amount: null,
       from: req.session.user.walletAcctNumber,
     },
     firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
-    totalBalance: wallet.totalBalance,
-    totalDeposits: wallet.totalDeposits,
-    totalWithdrawals: wallet.totalWithdrawals,
+    totalBalance: numeral(wallet.totalBalance).format("0,0"),
+    totalDeposits: numeral(wallet.totalDeposits).format("0,0"),
+    totalWithdrawals: numeral(wallet.totalWithdrawals).format("0,0"),
   });
 };
 
 exports.getTransfer = async (req, res) => {
+  const user = req.session.user;
+  const checkUser = await ModelUser.findOne({
+    "profile.email": user.profile.email,
+  });
+  if (!checkUser.active) {
+    let firstName = req.session.user.profile.firstName;
+    return res.render("transfer", {
+      title: "Transfer",
+      oldInput: {
+        amount: null,
+        to: req.session.user.walletAcctNumber,
+      },
+      firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
+      totalBalance: 0,
+      totalDeposits: 0,
+      totalWithdrawals: 0,
+      accountInactive: true,
+    });
+  }
   // get the user's wallet from the session. Use that to render the User's wallet balance
   const wallet = await Wallet.findOne({ userID: req.session.user._id });
   let firstName = req.session.user.profile.firstName;
   res.render("transfer", {
     title: "Transfer",
     firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
-    totalBalance: wallet.totalBalance,
-    totalDeposits: wallet.totalDeposits,
-    totalWithdrawals: wallet.totalWithdrawals,
+    totalBalance: numeral(wallet.totalBalance).format("0,0"),
+    totalDeposits: numeral(wallet.totalDeposits).format("0,0"),
+    totalWithdrawals: numeral(wallet.totalWithdrawals).format("0,0"),
     oldInput: {
       amount: "",
       to: "",
@@ -65,7 +123,7 @@ exports.getProfile = (req, res) => {
   res.render("view-profile", {
     layout: "profile",
     title: "Profile",
-    firstName:firstName.charAt(0).toUpperCase() + firstName.slice(1),
+    firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
     lastName: req.session.user.profile.lastName,
     email: req.session.user.profile.email,
     accountNumber: req.session.user.walletAcctNumber,
@@ -117,9 +175,11 @@ exports.postDeposit = async (req, res, next) => {
       },
       firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
       errorMessage: req.flash("error")[0],
-      totalBalance: wallet ? wallet.totalBalance : 0,
-      totalDeposits: wallet ? wallet.totalDeposits : 0,
-      totalWithdrawals: wallet ? wallet.totalWithdrawals : 0,
+      totalBalance: wallet ? numeral(wallet.totalBalance).format("0,0") : 0,
+      totalDeposits: wallet ? numeral(wallet.totalDeposits).format("0,0") : 0,
+      totalWithdrawals: wallet
+        ? numeral(wallet.totalWithdrawals).format("0,0")
+        : 0,
     });
   }
 };
@@ -165,9 +225,9 @@ exports.postWithdraw = async (req, res, next) => {
         from: acctNumber,
       },
       errorMessage: req.flash("error")[0],
-      totalBalance: wallet.totalBalance,
-      totalDeposits: wallet.totalDeposits,
-      totalWithdrawals: wallet.totalWithdrawals,
+      totalBalance: numeral(wallet.totalBalance).format("0,0"),
+      totalDeposits: numeral(wallet.totalDeposits).format("0,0"),
+      totalWithdrawals: numeral(wallet.totalWithdrawals).format("0,0"),
       firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
     });
   } catch (error) {
@@ -178,13 +238,15 @@ exports.postWithdraw = async (req, res, next) => {
       title: "Withdraw",
       oldInput: {
         amount: amountToNumber,
-        to: req.session.user.walletAcctNumber,
+        from: req.session.user.walletAcctNumber,
       },
       firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
       errorMessage: req.flash("error")[0],
-      totalBalance: wallet ? wallet.totalBalance : 0,
-      totalDeposits: wallet ? wallet.totalDeposits : 0,
-      totalWithdrawals: wallet ? wallet.totalWithdrawals : 0,
+      totalBalance: wallet ? numeral(wallet.totalBalance).format("0,0") : 0,
+      totalDeposits: wallet ? numeral(wallet.totalDeposit).format("0,0") : 0,
+      totalWithdrawals: wallet
+        ? numeral(wallet.totalWithdrawals).format("0,0")
+        : 0,
     });
   }
 };
@@ -209,9 +271,9 @@ exports.postTransfer = async (req, res, next) => {
       const wallet = await Wallet.findOne({ userID: req.session.user._id });
       return res.render("transfer", {
         title: "Transfer",
-        totalBalance: wallet.totalBalance,
-        totalDeposits: wallet.totalDeposits,
-        totalWithdrawals: wallet.totalWithdrawals,
+        totalBalance: numeral(wallet.totalBalance).format("0,0"),
+        totalDeposits: numeral(wallet.totalDeposits).format("0,0"),
+        totalWithdrawals: numeral(wallet.totalWithdrawals).format("0,0"),
         oldInput: {
           amount: req.body.amount,
           from: req.session.user.walletAcctNumber,
@@ -220,70 +282,72 @@ exports.postTransfer = async (req, res, next) => {
         errorMessage: req.flash("error")[0],
         firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
       });
-    }
-    // get the user from the req session
-    const user = req.session.user;
-    // use the user to extract the walletId, then find the user's wallet using that id
-    const userWallet = await Wallet.findOne({ userID: user._id });
-    // create a transfer object like this
-    // { from: this wallet id,to: receipent wallet, amount: amount}
-    // and
-    // save to transfer database
-    if (userWallet.totalBalance >= amountToNumber) {
-      const transfer = new TransferModel({
-        to: receiverWallet.accountNumber,
-        from: userWallet.accountNumber,
-        amount: amountToNumber,
-        transferString: uuid,
+    } else {
+      // get the user from the req session
+      const user = req.session.user;
+      // use the user to extract the walletId, then find the user's wallet using that id
+      const userWallet = await Wallet.findOne({ userID: user._id });
+      // create a transfer object like this
+      // { from: this wallet id,to: receipent wallet, amount: amount}
+      // and
+      // save to transfer database
+      if (userWallet.totalBalance >= amountToNumber) {
+        const transfer = new TransferModel({
+          to: receiverWallet.accountNumber,
+          from: userWallet.accountNumber,
+          amount: amountToNumber,
+          transferString: uuid,
+        });
+        // decrease wallet balance by amount
+        userWallet.totalBalance -= amountToNumber;
+        userWallet.totalWithdrawals += amountToNumber;
+        receiverWallet.totalBalance += amountToNumber;
+        receiverWallet.totalDeposits += amountToNumber;
+        await transfer.save();
+        await userWallet.save();
+        await receiverWallet.save();
+        req.flash(
+          "success",
+          `${amountToNumber} successfully transferred to ${to}`
+        );
+        return res.redirect("/");
+      }
+      // TODO: re-render the transfer page, passing in the relevant fields
+      req.flash("error", "Wallet balance is insufficient.");
+      const wallet = await Wallet.findOne({ userID: req.session.user._id });
+      let firstName = req.session.user.profile.firstName;
+      return res.render("transfer", {
+        title: "Transfer",
+        oldInput: {
+          amount: amountToNumber,
+          from: req.session.user.walletAcctNumber,
+          to: to,
+        },
+        totalBalance: numeral(wallet.totalBalance).format("0,0"),
+        totalDeposits: numeral(wallet.totalDeposits).format("0,0"),
+        totalWithdrawals: numeral(wallet.totalWithdrawals).format("0,0"),
+        errorMessage: req.flash("error")[0],
+        firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
       });
-      // decrease wallet balance by amount
-      userWallet.totalBalance -= amountToNumber;
-      userWallet.totalWithdrawals += amountToNumber;
-      receiverWallet.totalBalance += amountToNumber;
-      receiverWallet.totalDeposits += amountToNumber;
-      await transfer.save();
-      await userWallet.save();
-      await receiverWallet.save();
-      req.flash(
-        "success",
-        `${amountToNumber} successfully transferred to ${to}`
-      );
-      return res.redirect("/");
     }
-    // TODO: re-render the transfer page, passing in the relevant fields
-    // req.flash("error", "Wallet balance is insufficient.");
+  } catch (error) {
     req.flash("error", error.message);
     const wallet = await Wallet.findOne({ userID: req.session.user._id });
     let firstName = req.session.user.profile.firstName;
     return res.render("transfer", {
       title: "Transfer",
-      oldInput: {
-        amount: amountToNumber,
-        from: req.session.user.walletAcctNumber,
-        to: to,
-      },
-      totalBalance: wallet.totalBalance,
-      totalDeposits: wallet.totalDeposits,
-      totalWithdrawals: wallet.totalWithdrawals,
-      errorMessage: req.flash("error")[0],
-      firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
-    });
-  } catch (error) {
-    req.flash("error", error.message);
-    const wallet = await Wallet.findOne({ userID: req.session.user._id });
-    let firstName = req.session.admin.profile.firstName;
-    return res.render("transfer", {
-      title: "Transfer",
-      totalBalance: wallet ? wallet.totalBalance : 0,
-      totalDeposits: wallet ? wallet.totalDeposits : 0,
-      totalWithdrawals: wallet ? wallet.totalWithdrawals : 0,
+      totalBalance: wallet ? numeral(wallet.totalBalance).format("0,0") : 0,
+      totalDeposits: wallet ? numeral(wallet.totalDeposits).format("0,0") : 0,
+      totalWithdrawals: wallet
+        ? numeral(wallet.totalWithdrawals).format("0,0")
+        : 0,
       oldInput: {
         amount: req.body.amount,
         from: req.session.user.walletAcctNumber,
         to: req.body.to,
       },
       errorMessage: req.flash("error")[0],
-      firstName:firstName.charAt(0).toUpperCase() + firstName.slice(1),
+      firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
     });
   }
 };

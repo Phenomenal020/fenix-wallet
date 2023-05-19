@@ -1,6 +1,5 @@
 {{!< main }}
 
-<!-- Additional markup specific to the deposit page -->
 <section class="deposit-container">
   <h1 class="section-header">Deposit</h1>
 
@@ -10,52 +9,54 @@
     </p>
   {{/if}}
 
-  <form class="section-form" action="/actions/deposit" method="post">
-    <div class="mb-3 row">
-      <label for="depositField" class="col-sm-4 col-form-label">Account Number:</label>
-      <div class="col-sm-8">
-        <input
-          type="text"
-          readonly
-          class="form-control-plaintext"
-          id="depositField"
-          value="{{oldInput.to}}"
-        />
+  {{#if accountInactive}}
+    <h3>Your account needs to be activated first. You can not deposit any money to this wallet</h3>
+  {{else}}
+    <form class="section-form" action="/actions/deposit" method="post">
+      <div class="mb-3 row">
+        <label for="depositField" class="col-sm-4 col-form-label">Account
+          Number:</label>
+        <div class="col-sm-8">
+          <input
+            type="text"
+            readonly
+            class="form-control-plaintext"
+            id="depositField"
+            value="{{oldInput.to}}"
+          />
+        </div>
       </div>
-    </div>
-    <div class="mb-3 row">
-      <label
-        for="submitDepositBtn"
-        class="col-sm-4 col-form-label"
-      >Amount</label>
-      <div class="col-sm-8">
-        <input
-          type="number"
-          class="form-control"
-          id="submitDeposit"
-          name="amount"
-          min="0"
-          oninput="checkMinimumValue(this)"
-          value="{{oldInput.amount}}"
-        />
+      <div class="mb-3 row">
+        <label
+          for="submitDepositBtn"
+          class="col-sm-4 col-form-label"
+        >Amount</label>
+        <div class="col-sm-8">
+          <input
+            type="number"
+            class="form-control"
+            id="submitDeposit"
+            name="amount"
+            min="0"
+            oninput="checkMinimumValue(this)"
+            value="{{oldInput.amount}}"
+          />
+        </div>
       </div>
-    </div>
-    <div class="text-center">
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-    {{!-- <input type="hidden" name="_csrf" value="{{csrfToken}}" deprecated /> --}}
-  </form>
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+      {{!-- <input type="hidden" name="_csrf" value="{{csrfToken}}" deprecated /> --}}
+    </form>
+  {{/if}}
+
 </section>
 
 <script>
   function clearMsg() { const msgRef = document.querySelector("#msgBox");
   msgRef.textContent = "" }; const submitDepositRef =
   document.querySelector("#submitDeposit");
-  submitDepositRef.addEventListener("focus", clearMsg); 
-  
-  function checkMinimumValue(inputElement) { 
-    if (inputElement.value < 0) {
-      inputElement.value = 0;  
-    }
-  }
+  submitDepositRef.addEventListener("focus", clearMsg); function
+  checkMinimumValue(inputElement) { if (inputElement.value < 0) {
+  inputElement.value = 0; } }
 </script>

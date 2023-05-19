@@ -18,6 +18,10 @@ const transferSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      default: "Transfer",
+    },
     status: {
       type: String,
       default: "pending",

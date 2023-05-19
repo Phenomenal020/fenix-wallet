@@ -4,83 +4,82 @@
   <p class="success-message">{{successMsg}}</p>
 {{/if}}
 
+{{#if errorMessage}}
+  <p class="error-message">{{errorMessage}}</p>
+{{/if}}
+
 <div class="wallet-activity-wrapper">
   <h4 style="color: #333; margin-top: 6px">Pending Transfer Approvals</h4>
-    {{#if transfers}}
-  <div class="card">
-    <table class="table table-striped table-bordered">
-      <thead>
-        <tr>
-          <th scope="col">Date</th>
-          <th scope="col">From</th>
-          <th scope="col">To</th>
-          <th scope="col">Amount</th>
-          <th scope="col">Approve</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{#each transfers}}
+  {{#if transfers}}
+    <div class="card">
+      <table class="table table-striped table-bordered">
+        <thead>
           <tr>
-            <form action="/admin/approve" method="post" class="approval-form">
-              <td style="width: 25%"><input
-                  type="text"
-                  readonly
-                  class="form-control-plaintext"
-                  id="date"
-                  value="{{this.createdAt}}"
-                /></td>
-              <td style="width: 20%"><input
-                  type="text"
-                  readonly
-                  class="form-control-plaintext"
-                  id="from"
-                  value="{{this.from}}"
-                /></td>
-              <td style="width: 20%"><input
-                  type="text"
-                  readonly
-                  class="form-control-plaintext"
-                  id="to"
-                  value="{{this.to}}"
-                /></td>
-              <td style="width: 20%"><input
-                  type="text"
-                  readonly
-                  class="form-control-plaintext"
-                  id="amount"
-                  value="₦{{this.amount}}"
-                /></td>
-              <input
-                style="display: hidden"
-                type="hidden"
-                class="form-control-plaintext"
-                id="_id"
-                value="{{this.transferString}}"
-                name="transferString"
-              />
-              <td style="width: 15%"><button
-                  type="submit"
-                  class="btn btn-primary"
-                >Approve</button></td>
-            </form>
+            <th scope="col">Date</th>
+            <th scope="col">From</th>
+            <th scope="col">To</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Approve</th>
           </tr>
-        {{/each}}
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          {{#each transfers}}
+            <tr>
+              <form action="/admin/approve" method="post" class="approval-form">
+                <td style="width: 25%"><input
+                    type="text"
+                    readonly
+                    class="form-control-plaintext"
+                    id="date"
+                    value="{{this.createdAt}}"
+                  /></td>
+                <td style="width: 20%"><input
+                    type="text"
+                    readonly
+                    class="form-control-plaintext"
+                    id="from"
+                    value="{{this.from}}"
+                  /></td>
+                <td style="width: 20%"><input
+                    type="text"
+                    readonly
+                    class="form-control-plaintext"
+                    id="to"
+                    value="{{this.to}}"
+                  /></td>
+                <td style="width: 20%"><input
+                    type="text"
+                    readonly
+                    class="form-control-plaintext"
+                    id="amount"
+                    value="₦{{this.amount}}"
+                  /></td>
+                <input
+                  style="display: hidden"
+                  type="hidden"
+                  class="form-control-plaintext"
+                  id="_id"
+                  value="{{this.transferString}}"
+                  name="transferString"
+                />
+                <td style="width: 15%"><button
+                    type="submit"
+                    class="btn btn-primary"
+                  >Approve</button></td>
+              </form>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
   {{else}}
     <div class="card">No pending approvals</div>
   {{/if}}
 </div>
 
 <script>
-  const approvalForms = document.querySelectorAll('.approval-form'); 
-  approvalForms.forEach(form => {
-     form.addEventListener('submit', event => {
-        const shouldApprove = confirm('Do you want to approve this transfer?');
-        if (shouldApprove) { 
-          form.submit();
-       }
-      });
-   });
+  const approvalForms = document.querySelectorAll('.approval-form');
+  approvalForms.forEach(form => { form.addEventListener('submit', event => {
+  const shouldApprove = confirm('Do you want to approve this transfer?'); if
+  (shouldApprove) { form.submit(); } }); });
 </script>

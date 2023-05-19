@@ -1,62 +1,68 @@
 {{!< main }}
 
-
 <!-- Additional markup specific to the deposit page -->
 <section class="deposit-container">
   <h1 class="section-header">Transfer</h1>
-    {{#if errorMessage}}
+  {{#if errorMessage}}
     <p class="error-message" id="msgBox">
       {{errorMessage}}
     </p>
   {{/if}}
-  <form class="section-form" method="post" action="/actions/transfer">
-    <div class="mb-3 row">
-      <label for="fromField" class="col-sm-2 col-form-label">From:</label>
-      <div class="col-sm-10">
-        <input
-          type="text"
-          readonly
-          class="form-control-plaintext"
-          id="fromField"
-          value="{{ oldInput.from }}"
-        />
-      </div>
-    </div>
-    <div class="mb-3 row">
-      <label for="toField" class="col-sm-2 col-form-label">To:</label>
-      <div class="col-sm-10">
-        <input type="text" class="form-control" id="toField" name="to" value="{{oldInput.to}}" />
-      </div>
-    </div>
-    <div class="mb-3 row">
-      <label
-        for="amount"
-        class="col-sm-2 col-form-label"
-      >Amount</label>
-      <div class="col-sm-10">
-        <input type="text" class="form-control" id="amount" name="amount" value="{{oldInput.amount}}"/>
-      </div>
-    </div>
-    <div class="text-center">
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-    {{!-- <input type="hidden" name="_csrf" value="{{csrfToken}}" /> deprecated --}}
 
-  </form>
+  {{#if accountInactive}}
+    <h3>Your account needs to be activated first. You can not transfer any money to/from this wallet</h3>
+  {{else}}
+    <form class="section-form" method="post" action="/actions/transfer">
+      <div class="mb-3 row">
+        <label for="fromField" class="col-sm-2 col-form-label">From:</label>
+        <div class="col-sm-10">
+          <input
+            type="text"
+            readonly
+            class="form-control-plaintext"
+            id="fromField"
+            value="{{oldInput.from}}"
+          />
+        </div>
+      </div>
+      <div class="mb-3 row">
+        <label for="toField" class="col-sm-2 col-form-label">To:</label>
+        <div class="col-sm-10">
+          <input
+            type="text"
+            class="form-control"
+            id="toField"
+            name="to"
+            value="{{oldInput.to}}"
+          />
+        </div>
+      </div>
+      <div class="mb-3 row">
+        <label for="amount" class="col-sm-2 col-form-label">Amount</label>
+        <div class="col-sm-10">
+          <input
+            type="text"
+            class="form-control"
+            id="amount"
+            name="amount"
+            value="{{oldInput.amount}}"
+          />
+        </div>
+      </div>
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+      {{!-- <input type="hidden" name="_csrf" value="{{csrfToken}}" /> deprecated --}}
+
+    </form>
+  {{/if}}
 </section>
 
 <script>
   function clearMsg() { const msgRef = document.querySelector("#msgBox");
-  msgRef.textContent = "" }; 
-  const toRef = document.querySelector("#toField");
-  toRef.addEventListener("focus", clearMsg); 
-
-  const amountRef = document.querySelector("#amount");
-  amountRef.addEventListener("focus", clearMsg); 
-  
-  function checkMinimumValue(inputElement) { 
-    if (inputElement.value < 0) {
-      inputElement.value = 0;  
-    }
-  }
+  msgRef.textContent = "" }; const toRef = document.querySelector("#toField");
+  toRef.addEventListener("focus", clearMsg); const amountRef =
+  document.querySelector("#amount"); amountRef.addEventListener("focus",
+  clearMsg); function checkMinimumValue(inputElement) { if (inputElement.value <
+  0) { inputElement.value = 0; } }
 </script>

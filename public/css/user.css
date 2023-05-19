@@ -8,6 +8,10 @@
   font-family: "Poppins", sans-serif;
 }
 
+.active-button {
+  background-color: #0a2558 !important;
+}
+
 /* container for the page */
 .page-container {
   width: 100%;

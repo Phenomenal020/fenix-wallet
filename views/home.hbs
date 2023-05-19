@@ -9,54 +9,152 @@
 {{/if}}
 
 <div class="wallet-activity-wrapper">
+
   <h4 style="color: #333; margin-top: 6px">Wallet activities</h4>
+
   <div class="card">
 
+    {{#if admin}}
     <div
       style="display: flex; align-items: center !important; justify-content: space-between !important; margin-bottom: 16px"
     >
       <p
         style="text-align: center; align-self: center; width: 20%; margin-bottom: 0px !important"
       >Filter by: </p>
-      <div style="width: 80%">
-        <button
+      <div style="width: 80%" class="filter-btns">
+        <a
+          href="/admin/?filter=transfer"
           type="button"
-          class="btn btn-primary"
+          class="btn btn-primary {{#if transferClass}}active-button{{/if}}"
+          style="width: 30%; margin-right: 2%" id="filter-btn"
+        >Transfers</a>
+        <a
+          href="/admin/?filter=deposit"
+          type="button"
+          id="filter-btn"
+          class="btn btn-primary {{#if depositClass}}active-button{{/if}}"
           style="width: 30%; margin-right: 2%"
-        >Transfers</button>
-        <button
+         
+        >Deposits</a>
+        <a
+          href="/admin/?filter=withdrawal"
           type="button"
-          class="btn btn-primary"
-          style="width: 30%;  margin-right: 2%"
-        >Deposits</button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          style="width: 30%;  margin-right: 2%"
-        >Withdrawals</button>
+          id="filter-btn"
+          class="btn btn-primary {{#if withdrawClass}}active-button{{/if}}"
+          style="width: 30%; margin-right: 2%"
+        >Withdrawals</a>
       </div>
     </div>
+    {{else}}
+     <div
+      style="display: flex; align-items: center !important; justify-content: space-between !important; margin-bottom: 16px"
+    >
+      <p
+        style="text-align: center; align-self: center; width: 20%; margin-bottom: 0px !important"
+      >Filter by: </p>
+      <div style="width: 80%" class="filter-btns">
+        <a
+          href="/?filter=transfer"
+          type="button"
+          class="btn btn-primary {{#if transferClass}}active-button{{/if}}"
+          style="width: 30%; margin-right: 2%" id="filter-btn"
+        >Transfers</a>
+        <a
+          href="/?filter=deposit"
+          type="button"
+          id="filter-btn"
+          class="btn btn-primary {{#if depositClass}}active-button{{/if}}"
+          style="width: 30%; margin-right: 2%"
+         
+        >Deposits</a>
+        <a
+          href="/?filter=withdrawal"
+          type="button"
+          id="filter-btn"
+          class="btn btn-primary {{#if withdrawClass}}active-button{{/if}}"
+          style="width: 30%; margin-right: 2%"
+        >Withdrawals</a>
+      </div>
+    </div>
+    {{/if}}
 
-    <table class="table table-striped table-bordered">
-      <thead>
-        <tr>
-          <th scope="col">Date</th>
-          <th scope="col">Status</th>
-          <th scope="col">Type</th>
-          <th scope="col">Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{#each transfers}}
+    {{#if items.length}}
+      <table class="table table-striped table-bordered">
+        <thead>
           <tr>
-            <td style="width: 30%">{{this.createdAt}}</td>
-            <td style="width: 25%">{{this.status}}</td>
-            <td style="width: 25%">Transfer</td>
-            <td style="width: 20%">₦{{this.amount}}</td>
+            <th scope="col">Date</th>
+            <th scope="col">Status</th>
+            <th scope="col">Type</th>
+            <th scope="col">Amount</th>
           </tr>
-        {{/each}}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {{#each items}}
+            <tr>
+              <td style="width: 30%">{{this.createdAt}}</td>
+              <td style="width: 25%">{{this.status}}</td>
+              <td style="width: 25%">{{this.type}}</td>
+              <td style="width: 20%">₦{{this.amount}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    {{else}}
+      <p>No records found.</p>
+    {{/if}}
+
+    {{#if pageEmpty}}
+    {{else}}
+        {{#if admin}}
+        <ul aria-label="navigation" class="pagination">
+        {{#if isFirstPage}}
+        <li class="page-item">
+          <a style="color: #0A2558; font-weight: bold" class="page-link" href="/admin/?page=1{{#if filter}}&filter={{filter}}{{/if}}">First</a>
+        {{else}}
+          <a style="opacity: 0.4" class="page-link" href="/admin/?page=1{{#if filter}}&filter={{filter}}{{/if}}">First</a>
+        </li>
+        {{/if}}
+
+        {{#if hasPrev}}
+          <li class="page-item">
+          <a style="opacity: 0.4" class="page-link" href="/admin/?page={{prevPage}}{{#if filter}}&filter={{filter}}{{/if}}">Prev</a>
+        </li>
+    {{/if}}
+
+      {{!-- {{#each pages}}
+        {{#if currPage}}
+          <span>{{ page }}</span>
+        {{else}}
+          <a href="/admin/?page={{ page }}{{#if filter}}&filter={{filter}}{{/if}}">{{ page }}</a>
+        {{/if}}
+      {{/each}} --}}
+
+      {{#if hasNext}}
+        <li class="page-item">
+          <a style="opacity: 0.4" class="page-link" href="/admin/?page={{nextPage}}{{#if filter}}&filter={{filter}}{{/if}}">Next</a>
+        </li>
+        {{else}}
+        {{/if}}
+
+          <li class="page-item">
+          <a {{#if isLastPage}}style="color: #0A2558; font-weight: bold"{{else}}style="opacity: 0.4"{{/if}}class="page-link" href="/admin/?page={{totalPages}}{{#if filter}}&filter={{filter}}{{/if}}">Last</a>
+        </li>
+
+        </ul>
+        {{else}}
+        {{/if}}
+    {{/if}}
+
   </div>
 
 </div>
+
+
+  {{!-- {{#each pages}}
+    {{#if current}}
+      <span>{{ page }}</span>
+    {{else}}
+      <a href="/admin/?page={{ page }}{{#if filter}}&filter={{filter}}{{/if}}">{{ page }}</a>
+    {{/if}}
+  {{/each}} --}}
+

@@ -63,13 +63,17 @@
   {{else}}
     <div class="card">No pending activation</div>
   {{/if}}
+
+  {{#if pageFull}}
+  {{!-- pagination here --}}
+{{/if}}
 </div>
 
 <script>
   const approvalForms = document.querySelectorAll('.activate-form'); approvalForms.forEach(form => {
      form.addEventListener('submit', event => {  
       event.preventDefault();
-      const shouldApprove = confirm('Do you want to approve this transfer');
+      const shouldApprove = confirm("Do you want to activate this user's wallet?");
       if (shouldApprove) { 
         form.submit(); 
       } 
