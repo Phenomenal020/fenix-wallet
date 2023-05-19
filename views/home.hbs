@@ -1,13 +1,23 @@
 {{!< main }}
+ {{#if successMsg}} 
+<div class="alert alert-success alert-dismissible container justify-content-center align-items-center w-75 mt-3 fade show" role="alert">
+  <strong class="error-message" id="msgBox">{{successMsg}}</strong>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {{/if}}
 
-{{#if successMsg}}
-  <p class="success-message">{{successMsg}}</p>
-{{/if}}
+  {{#if errorMessage}}
+  <div class="alert alert-success alert-dismissible w-50 container d-flex justify-content-center align-items-center fade show" role="alert">
+    <strong class="error-message" id="msgBox">{{successMsg}}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {{/if}}
 
-{{#if errorMessage}}
-  <p class="error-message">{{successMsg}}</p>
-{{/if}}
+  <div class="wallet-activity-wrapper">
+    <h4 style="color: #333; margin-top: 6px">Wallet activities</h4>
+    <div class="card">
 
+<<<<<<< Updated upstream
 <div class="wallet-activity-wrapper">
 
   <h4 style="color: #333; margin-top: 6px">Wallet activities</h4>
@@ -81,12 +91,36 @@
     {{#if items.length}}
       <table class="table table-striped table-bordered">
         <thead>
+=======
+      <div
+        style="display: flex; align-items: center !important; justify-content: space-between !important; margin-bottom: 16px">
+        <p style="text-align: center; align-self: center; width: 20%; margin-bottom: 0px !important">Filter by: </p>
+        <div style="width: 80%">
+          <button type="button" class="btn btn-primary" style="width: 30%; margin-right: 2%">Transfers</button>
+          <button type="button" class="btn btn-primary" style="width: 30%;  margin-right: 2%">Deposits</button>
+          <button type="button" class="btn btn-primary" style="width: 30%;  margin-right: 2%">Withdrawals</button>
+        </div>
+      </div>
+
+      <table class="table table-striped table-bordered">
+        <thead>
           <tr>
             <th scope="col">Date</th>
             <th scope="col">Status</th>
             <th scope="col">Type</th>
             <th scope="col">Amount</th>
           </tr>
+        </thead>
+        <tbody>
+          {{#each transfers}}
+>>>>>>> Stashed changes
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Status</th>
+            <th scope="col">Type</th>
+            <th scope="col">Amount</th>
+          </tr>
+<<<<<<< Updated upstream
         </thead>
         <tbody>
           {{#each items}}
@@ -158,3 +192,10 @@
     {{/if}}
   {{/each}} --}}
 
+=======
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+>>>>>>> Stashed changes

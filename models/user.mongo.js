@@ -27,6 +27,10 @@ const modelUserSchema = new mongoose.Schema(
         type: String,
       },
     },
+    resetToken:String,
+
+    resetTokenExpiration:Date,
+    
     walletAcctNumber: {
       type: String,
       required: true,

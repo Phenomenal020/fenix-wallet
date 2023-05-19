@@ -235,7 +235,23 @@
   flex-basis: 20%;
   text-align: center;
 }
-
+.pagination {
+  margin-top: 2rem;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+.pagination a {
+  text-decoration: none;
+  color: #10367e;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgb(83, 85, 139);
+  margin: 0 1rem;
+}
+.pagination a:hover , .pagination a:active{
+background-color: #bbb;
+color: #10367e;
+}
 .transaction-type {
   flex-basis: 30%;
   text-align: center;
@@ -276,29 +292,6 @@
   border: 1px solid #0a2558;
   border-radius: 24px;
 }
-
-/* .profile-picture-container {
-  width: 100%;
-  padding: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.profile-picture-wrapper {
-  position: relative;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  overflow: hidden;
-  align-self: center;
-}
-
-.profile-picture {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-} */
 
 /* Avatar File Input Wrapper */
 div#AvatarFileUpload {
@@ -354,22 +347,22 @@ div#AvatarFileUpload > .avatar-selector > .avatar-selector-btn > img {
   border-color: red;
 }
 .success-message {
-  color: green;
+  /* color: green; */
   text-align: center;
   margin-top: 30px;
   font-size: 24px;
-  width: 100%;
-  font-weight: bold;
-  border: 2px solid #0a255898;
+  /* width: 100%; */
+  /* font-weight: bold; */
+  /* border: 2px solid #0a255898; */
 }
 
 .error-message {
-  color: red;
+  /* color: red; */
   text-align: center;
   margin-top: 30px;
   font-size: 24px;
-  font-weight: bold;
-  border: 2px solid #0a255898;
+  /* font-weight: bold; */
+  /* border: 2px solid #0a255898; */
 }
 
 @media screen and (max-width: 768px) {

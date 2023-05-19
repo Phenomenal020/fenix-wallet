@@ -1,9 +1,9 @@
-// const crypto = require("crypto");
+const crypto = require("crypto");
 
 const bcrypt = require("bcryptjs");
 
-// const nodemailer = require('nodemailer');
-// const sendgridTransport = require('nodemailer-sendgrid-transport');
+const nodemailer = require('nodemailer');
+const sendgridTransport = require('nodemailer-sendgrid-transport');
 
 const { validationResult } = require("express-validator/check");
 
@@ -11,14 +11,14 @@ const ModelUser = require("../models/user.mongo");
 const ModelAdmin = require("../models/admin.mongo");
 const ModelWallet = require("../models/wallet.mongo");
 
-// const transporter = nodemailer.createTransport(
-//   sendgridTransport({
-//     auth: {
-//       api_key:
-//         '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'
-//     }
-//   })
-// );
+const transporter = nodemailer.createTransport(
+  sendgridTransport({
+    auth: {
+      api_key:
+        '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'
+    }
+  })
+);
 
 exports.getLogin = (req, res, next) => {
   res.render("login", {
@@ -195,12 +195,14 @@ exports.postSignup = async (req, res, next) => {
       }
       await newAdmin.save();
       console.log(newAdmin);
-      // return transporter.sendMail({
-      //   to: email,
-      //   from: 'shop@node-complete.com',
-      //   subject: 'Signup succeeded!',
-      //   html: '<h1>You successfully signed up!</h1>'
-      // });
+
+      //To send Email to User after Successful Registration
+      return transporter.sendMail({
+        to: email,
+        from: 'fenixwallet@gmail.com',
+        subject: 'Signup succeeded!',
+        html: '<h1>You successfully Signed Up To Our E-Wallet!</h1>'
+      });
       return res.redirect("/auth/login");
     }
     const existingUser = await ModelUser.findOne({ "profile.email": email });
@@ -265,56 +267,105 @@ exports.getLogout = (req, res, next) => {
   });
 };
 
-// exports.getReset = (req, res, next) => {
-//   let message = req.flash('error');
-//   if (message.length > 0) {
-//     message = message[0];
-//   } else {
-//     message = null;
-//   }
-//   res.render('auth/reset', {
-//     path: '/reset',
-//     pageTitle: 'Reset Password',
-//     errorMessage: message
-//   });
-// };
+exports.getReset = (req, res, next) => {
+  let message = req.flash('error');
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+  res.render("reset", {
+    layout: "index",
+    title: "Reset Password",
+    errorMessage: req.flash("error")[0],
+  }); 3
+};
 
-// exports.postReset = (req, res, next) => {
-//   crypto.randomBytes(32, (err, buffer) => {
-//     if (err) {
-//       console.log(err);
-//       return res.redirect('/reset');
-//     }
-//     const token = buffer.toString('hex');
-//     User.findOne({ email: req.body.email })
-//       .then(user => {
-//         if (!user) {
-//           req.flash('error', 'No account with that email found.');
-//           return res.redirect('/reset');
-//         }
-//         user.resetToken = token;
-//         user.resetTokenExpiration = Date.now() + 3600000;
-//         return user.save();
-//       })
-//       .then(result => {
-//         res.redirect('/');
-//         transporter.sendMail({
-//           to: req.body.email,
-//           from: 'shop@node-complete.com',
-//           subject: 'Password reset',
-//           html: `
-//             <p>You requested a password reset</p>
-//             <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p>
-//           `
-//         });
-//       })
-//       .catch(err => {
-//         const error = new Error(err);
-//         error.httpStatusCode = 500;
-//         return next(error);
-//       });
-//   });
-// };
+exports.postReset = async (req, res, next) => {
+  const email = req.body.email;
+  try {
+    crypto.randomBytes(32, async (err, buffer) => {
+      if (err) {
+        console.log(err);
+        return res.redirect('/reset');
+      }
+      const token = buffer.toString('hex');
+      const existingUser = await ModelUser.findOne({ "profile.email": email });
+      if (!existingUser) {
+        req.flash('error', 'No account with that email found.');
+        return res.redirect('reset');
+      }
+      resetToken = token;
+      resetTokenExpiration = Date.now() + 3600000;
+      await existingUser.save();
+      res.redirect('/');
+      transporter.sendMail({
+        to: req.body.email,
+        from: 'alphask37@gmail.com',
+        subject: 'Password reset',
+        html: `
+            <p>You requested a password reset</p>
+            <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p>
+          `
+      });
+    });
+  } catch (error) {
+    req.flash("error", error.message);
+    return res.render("reset", {
+      layout: "index",
+      title: "Reset",
+      errorMessage: req.flash("error")[0],
+    });
+  }
+};
+
+
+exports.getNewPassword = async (req, res, next) => {
+  const token = req.params.token;
+  try {
+    const tokenExist = await ModelUser.findOne({ "resetToken": token, resetTokenExpiration: { $gt: Date.now() } });
+    if (!tokenExist) {
+      let message = req.flash('error');
+      if (message.length > 0) {
+        message = message[0];
+      } else {
+        message = null;
+      }
+      res.render("new-password", {
+        layout: "index",
+        title: "New Password",
+        errorMessage: req.flash("error")[0],
+        userId: user._id.toString(),
+        passwordToken: token,
+      });
+    } else {
+      let message = req.flash('error');
+      if (message.length > 0) {
+        message = message[0];
+      } else {
+        message = null;
+      }
+      res.render("new-password", {
+        layout: "index",
+        title: "New Password",
+        errorMessage: req.flash("error")[0],
+      });
+    }
+  } catch (error) {
+    let message = req.flash('error');
+    if (message.length > 0) {
+      message = message[0];
+    } else {
+      message = null;
+    }
+    res.render("new-password", {
+      layout: "index",
+      title: "New Password",
+      errorMessage: req.flash("error")[0],
+    });
+  }
+};
+
 
 // exports.getNewPassword = (req, res, next) => {
 //   const token = req.params.token;
@@ -341,27 +392,43 @@ exports.getLogout = (req, res, next) => {
 //     });
 // };
 
-// exports.postNewPassword = (req, res, next) => {
-//   const newPassword = req.body.password;
-//   const userId = req.body.userId;
-//   const passwordToken = req.body.passwordToken;
-//   let resetUser;
+exports.postNewPassword = async (req, res, next) => {
+  const newPassword = req.body.password;
+  const userId = req.body.userId;
+  const passwordToken = req.body.passwordToken;
+  let resetUser;
+    try{
+      const tokenExist = await ModelUser.findOne({ "resetToken": token, resetTokenExpiration: { $gt: Date.now() }, _id: userId });
+      if(tokenExist){
+        resetUser = user;
+        return bcrypt.hash(newPassword, 12);
+      }
+      if(hashedPassword){
+       resetUser.password = hashedPassword;
+       resetUser.resetToken = undefined;
+       resetUser.resetTokenExpiration = undefined;
+       return resetUser.save();
+      }
+      res.redirect('/login');
+    }catch (error) {
+      let message = req.flash('error');
+      if (message.length > 0) {
+        message = message[0];
+      } else {
+        message = null;
+      }
+      res.render("new-password", {
+        layout: "index",
+        title: "New Password",
+        errorMessage: req.flash("error")[0],
+      });
+    }
+    
+    
 
-//   User.findOne({
-//     resetToken: passwordToken,
-//     resetTokenExpiration: { $gt: Date.now() },
-//     _id: userId
-//   })
-//     .then(user => {
-//       resetUser = user;
-//       return bcrypt.hash(newPassword, 12);
-//     })
-//     .then(hashedPassword => {
-//       resetUser.password = hashedPassword;
-//       resetUser.resetToken = undefined;
-//       resetUser.resetTokenExpiration = undefined;
-//       return resetUser.save();
-//     })
+
+
+// 
 //     .then(result => {
 //       res.redirect('/login');
 //     })
@@ -370,4 +437,4 @@ exports.getLogout = (req, res, next) => {
 //       error.httpStatusCode = 500;
 //       return next(error);
 //     });
-// };
+};
