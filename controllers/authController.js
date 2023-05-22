@@ -14,8 +14,7 @@ const ModelWallet = require("../models/wallet.mongo");
 const transporter = nodemailer.createTransport(
   sendgridTransport({
     auth: {
-      api_key:
-        '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'
+      api_key: process.env.Send_Mail
     }
   })
 );
@@ -302,13 +301,14 @@ exports.postReset = async (req, res, next) => {
       transporter.sendMail({
         to: req.body.email,
         from: 'alphask37@gmail.com',
-        subject: 'Password reset',
+        subject: 'Password Reset',
         html: `
             <p>You requested a password reset</p>
             <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p>
           `
       });
     });
+    
   } catch (error) {
     req.flash("error", error.message);
     return res.render("reset", {
@@ -366,32 +366,6 @@ exports.getNewPassword = async (req, res, next) => {
   }
 };
 
-
-// exports.getNewPassword = (req, res, next) => {
-//   const token = req.params.token;
-//   User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } })
-//     .then(user => {
-//       let message = req.flash('error');
-//       if (message.length > 0) {
-//         message = message[0];
-//       } else {
-//         message = null;
-//       }
-//       res.render('auth/new-password', {
-//         path: '/new-password',
-//         pageTitle: 'New Password',
-//         errorMessage: message,
-//         userId: user._id.toString(),
-//         passwordToken: token
-//       });
-//     })
-//     .catch(err => {
-//       const error = new Error(err);
-//       error.httpStatusCode = 500;
-//       return next(error);
-//     });
-// };
-
 exports.postNewPassword = async (req, res, next) => {
   const newPassword = req.body.password;
   const userId = req.body.userId;
@@ -423,18 +397,5 @@ exports.postNewPassword = async (req, res, next) => {
         errorMessage: req.flash("error")[0],
       });
     }
+  }
     
-    
-
-
-
-// 
-//     .then(result => {
-//       res.redirect('/login');
-//     })
-//     .catch(err => {
-//       const error = new Error(err);
-//       error.httpStatusCode = 500;
-//       return next(error);
-//     });
-};

@@ -314,37 +314,6 @@ exports.postApproveTransfer = async (req, res, next) => {
     const newTransfer = await TransferModel.findOne({
       transferString: transferString,
     });
-    if (!newTransfer) {
-      const resultBal = await Wallet.aggregate([
-        { $group: { _id: null, totalBalanceSum: { $sum: "$totalBalance" } } },
-      ]);
-      const resultDeps = await Wallet.aggregate([
-        { $group: { _id: null, totalDepositSum: { $sum: "$totalDeposits" } } },
-      ]);
-      const resultWiths = await Wallet.aggregate([
-        {
-          $group: {
-            _id: null,
-            totalWithdrawalSum: { $sum: "$totalWithdrawals" },
-          },
-        },
-      ]);
-      const transfers = await TransferModel.find({ status: "pending" });
-      req.flash("error", "Transfer invalid");
-      let firstName = req.session.admin.profile.firstName;
-      return res.render("approve", {
-        title: "Admin dashboard",
-        errorMessage: req.flash("error")[0],
-        firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
-        totalBalance: numeral(resultBal[0].totalBalanceSum).format("0,0"),
-        totalDeposits: numeral(resultDeps[0].totalDepositSum).format("0,0"),
-        totalWithdrawals: numeral(resultWiths[0].totalWithdrawalSum).format(
-          "0,0"
-        ),
-        admin: true,
-        transfers: transfers,
-      });
-    }
     const resultBal = await Wallet.aggregate([
       { $group: { _id: null, totalBalanceSum: { $sum: "$totalBalance" } } },
     ]);
@@ -362,12 +331,10 @@ exports.postApproveTransfer = async (req, res, next) => {
     newTransfer.status = "approved";
     const resp = await newTransfer.save();
     const transfers = await TransferModel.find({ status: "pending" });
-    req.flash("error", "Transfer invalid");
     req.flash("success", "Transfer approved");
     let firstName = req.session.admin.profile.firstName;
     return res.render("approve", {
       title: "Admin dashboard",
-      errorMessage: req.flash("error")[0],
       successMsg: req.flash("success")[0],
       firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
       totalBalance: numeral(resultBal[0].totalBalanceSum).format("0,0"),

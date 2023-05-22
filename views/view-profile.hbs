@@ -2,12 +2,18 @@
 
 <section class="profile-container">
 
-  {{#if errorMessage}}
-    <p class="error-message" id="msgBox">{{errorMessage}}</p>
+ {{#if successMsg}} 
+<div class="alert alert-success alert-dismissible container justify-content-center align-items-center w-75 mt-3 fade show" role="alert">
+  <strong class="error-message" id="msgBox">{{successMsg}}</strong>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
   {{/if}}
 
-  {{#if successMessage}}
-    <p class="success-message" id="msgBox">{{successMessage}}</p>
+  {{#if errorMessage}}
+  <div class="alert alert-danger alert-dismissible w-50 container d-flex justify-content-center align-items-center fade show" role="alert">
+    <strong class="error-message" id="msgBox">{{errorMessage}}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
   {{/if}}
 
   <form method="post" action="/actions/profile" enctype="multipart/form-data">

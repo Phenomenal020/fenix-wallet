@@ -2,6 +2,28 @@
   <div class="sidebar-button">
     <span class="dashboard">Welcome back, {{firstName}}</span>
   </div>
+
+  {{!-- <div class="card-body w-50 rounded-0">
+      <div id="AvatarFileUpload">
+        <div class="selected-image-holder">
+          <label for="image">
+            {{#if imageUrl}}
+            <img
+              src="/uploads/{{imageUrl}}"
+              alt="profile picture"
+              name="image"
+            />
+            {{else}}
+                 <img
+                src="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
+                alt="profile picture"
+                name="image"
+                />
+            {{/if}}
+          </label>
+        </div>
+      </div>
+    </div> --}}
   {{#if firstName}}
   {{else}}
     <div class="profile-details">
